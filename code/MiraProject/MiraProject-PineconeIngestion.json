@@ -1,0 +1,427 @@
+{
+  "name": "MiraProject-PineconeIngestion",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "mira-pineconeindex",
+          "mode": "list",
+          "cachedResultName": "mira-pineconeindex"
+        },
+        "options": {
+          "pineconeNamespace": "NS_miraprojectplanningfiles"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        160
+      ],
+      "id": "de3783f7-3927-42ad-b7e0-3f22857a35a0",
+      "name": "R8: Pinecone: Insert Documents",
+      "credentials": {
+        "pineconeApi": {
+          "id": "TGHtd72Zc4t0d7a5",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": "={{ 768 }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        384
+      ],
+      "id": "845866fb-73e6-4c64-80e7-ee8801863d22",
+      "name": "R8: Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ $json.name.includes('Risk Register') ? 'risk_register'\n  : $json.name.includes('Task Board') ? 'task_board'\n  : $json.name.includes('Timeline') ? 'timeline'\n  : 'drive_doc' }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        400
+      ],
+      "id": "618daf47-11b2-462c-b5e8-730e7a8ffc7d",
+      "name": "R8: Default Data Loader"
+    },
+    {
+      "parameters": {
+        "separator": "\\n",
+        "chunkOverlap": 250
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        512
+      ],
+      "id": "e3dd6cf2-d147-494e-ab61-b2164480e438",
+      "name": "R8: Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        48,
+        304
+      ],
+      "id": "5b0cfd00-c4f6-440e-a596-50e010079216",
+      "name": "R1: Trigger Pinecone Embedding"
+    },
+    {
+      "parameters": {
+        "content": "## pinecone ingestion",
+        "height": 656,
+        "width": 1536,
+        "color": "#EBEAEA"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "dab8d1d9-a96f-4452-b277-c44f66f5346c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1072,
+        96
+      ],
+      "id": "d4f1bb6d-32d9-4b9c-91be-866264502e0d",
+      "name": "R7: Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "application/pdf"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        880,
+        64
+      ],
+      "id": "4c92f6d7-6f52-4dcb-95ab-ce603d6a48c4",
+      "name": "R6: Download New File(s)",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "p16XsbnVToWPlLwr",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1y-kny5YLFQzn453ldyhul5fboUDPzMbv",
+            "mode": "list",
+            "cachedResultName": "CapstoneProject-Mira",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1y-kny5YLFQzn453ldyhul5fboUDPzMbv"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        128
+      ],
+      "id": "90cb0235-f8c7-429d-905b-506caca9319e",
+      "name": "R5: Search Drive Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "p16XsbnVToWPlLwr",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mira-pineconeindex-unyv3gm.svc.aped-4627-b74a.pinecone.io/vectors/delete",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{ \"deleteAll\": true, \"namespace\": \"NS_miraprojectplanningfiles\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        560,
+        48
+      ],
+      "id": "df3b07b6-cdca-4a36-a8e2-313b36172497",
+      "name": "R4: HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FQcF82r8uhkDAlaB",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "334b3f71-85ce-423c-850c-83436e2f1c0f",
+              "leftValue": "={{ Object.keys($json.namespaces || {}).includes('NS_miraprojectplanningfiles') }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        304
+      ],
+      "id": "50e50f95-1a6c-41b2-8c1c-482b80ac8799",
+      "name": "R3: IF Namespace Exists?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://mira-pineconeindex-unyv3gm.svc.aped-4627-b74a.pinecone.io/describe_index_stats",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        208,
+        352
+      ],
+      "id": "9bc26b7c-2203-4bb9-8ebe-5c0a834edb1e",
+      "name": "R2: Check Index Stats (HTTP Request)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "FQcF82r8uhkDAlaB",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "R8: Pinecone: Insert Documents": {
+      "main": [
+        [
+          {
+            "node": "R7: Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R8: Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "R8: Pinecone: Insert Documents",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R8: Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "R8: Pinecone: Insert Documents",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R8: Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "R8: Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R1: Trigger Pinecone Embedding": {
+      "main": [
+        [
+          {
+            "node": "R2: Check Index Stats (HTTP Request)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R7: Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "R8: Pinecone: Insert Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R6: Download New File(s)": {
+      "main": [
+        [
+          {
+            "node": "R7: Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R5: Search Drive Folder": {
+      "main": [
+        [
+          {
+            "node": "R6: Download New File(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R4: HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "R5: Search Drive Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R3: IF Namespace Exists?": {
+      "main": [
+        [
+          {
+            "node": "R4: HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "R5: Search Drive Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R2: Check Index Stats (HTTP Request)": {
+      "main": [
+        [
+          {
+            "node": "R3: IF Namespace Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "56839c0c-2c50-4d6e-bbf1-d264b9d8211a",
+  "meta": {
+    "instanceId": "4ef392a66fc7bdf12c25758c4b85dea009b646785e2b6546f44ba6010b356125"
+  },
+  "nodeGroups": [],
+  "id": "2RaPrQBviloQ4HxO",
+  "tags": []
+}

@@ -1,0 +1,362 @@
+id,agent,type,input,context,scenario_type,expected_deliverable,key_facts_expected,entity_pool,conciseness_expectation,known_reference_output_flags,must_contain,must_not_contain,actual_reference_output
+T1,N11: Planner Agent,Plan (detailed),Generate a project plan for the AI Adoption Project at ABCDE Ltd. Use the provided project description.,"<project_description>
+ABCDE Ltd. is a mid-sized logistics and supply chain company running an AI adoption initiative to improve operational efficiency, customer experience, and data-driven decision-making. Focus areas: demand forecasting, route optimization, inventory management, and customer support. Phased rollout: workflow/data assessment, then pilot implementations. Goals: reduce delivery delays by 15%, lower operational costs by 10%, improve service responsiveness. Overseen by a cross-functional task force (data scientists, IT, business stakeholders).
+</project_description>
+
+<timeline>
+- M01 | Phase 1: Project Initiation | Team structure finalized | Status: Done | Owner: Arjun Mehta | 31-08-2026 to 13-09-2026
+- M02 | Phase 1: Project Initiation | Project charter signed off | Status: Done | Owner: Arjun Mehta | 31-08-2026 to 13-09-2026
+- M03 | Phase 2: Current State Analysis | Current systems audit report | Status: Done | Owner: Priya Nair | 14-09-2026 to 27-09-2026
+- M04 | Phase 2: Current State Analysis | Gap analysis report | Status: In Progress | Owner: Priya Nair | 14-09-2026 to 27-09-2026
+- M05 | Phase 3: Use Case Selection | Final prioritized use case list with success criteria | Status: In Progress | Owner: Arjun Mehta | 28-09-2026 to 11-10-2026
+- M06 | Phase 4: Pilot Design | Data pipelines established | Status: Not Started | Owner: Priya Nair | 12-10-2026 to 08-11-2026
+- M07 | Phase 4: Pilot Design | Working prototype models | Status: Not Started | Owner: Ravi Kumar | 12-10-2026 to 08-11-2026
+- M08 | Phase 5: Pilot Implementation | Pilot results report | Status: Not Started | Owner: James Wong | 09-11-2026 to 06-12-2026
+- M09 | Phase 5: Pilot Implementation | User feedback and performance metrics | Status: Not Started | Owner: Sarah Lin | 09-11-2026 to 06-12-2026
+- M10 | Phase 6: Evaluation & Iteration | Updated models and process refinements | Status: Not Started | Owner: Ravi Kumar | 07-12-2026 to 20-12-2026
+- M11 | Phase 7: Full Deployment | Full production rollout | Status: Not Started | Owner: Arjun Mehta | 21-12-2026 to 31-01-2027
+- M12 | Phase 7: Full Deployment | Training sessions completed | Status: Not Started | Owner: Sarah Lin | 21-12-2026 to 31-01-2027
+- M13 | Phase 8: Monitoring & Review | Project closure report | Status: Not Started | Owner: Arjun Mehta | 01-02-2027 to 14-02-2027
+- M14 | Phase 8: Monitoring & Review | Recommendations for future scaling | Status: Not Started | Owner: Arjun Mehta | 01-02-2027 to 14-02-2027
+</timeline>
+
+<task_board>
+- T001 | Define project scope and objectives | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 08-09-2026 | Document project scope, goals, and success criteria for AI adoption
+- T002 | Form cross-functional task force | Status: Done | Assignee: Sarah Lin | Sprint: Sprint 1 | Due: 08-09-2026 | Identify and onboard team members from data science, IT, and business units
+- T003 | Initial stakeholder alignment meeting | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 11-09-2026 | Present project charter and get sign-off from leadership
+- T004 | Audit existing data infrastructure | Status: Done | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 19-09-2026 | Assess current databases, data pipelines, and data quality
+- T005 | Map current logistics workflows | Status: Done | Assignee: James Wong | Sprint: Sprint 2 | Due: 19-09-2026 | Document end-to-end processes for demand forecasting, routing, and inventory
+- T006 | Identify data gaps and quality issues | Status: In Progress | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 22-09-2026 | Gap analysis report comparing available data vs requirements for AI models
+- T007 | Shortlist AI use cases | Status: In Progress | Assignee: Arjun Mehta | Sprint: Sprint 3 | Due: 29-09-2026 | Evaluate and prioritize: demand forecasting, route optimization, inventory mgmt, customer support
+- T025 | Legal review of data usage | Status: In Progress | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 29-09-2026 | Review data privacy compliance for using customer delivery data in ML models
+- T008 | Define success criteria for each use case | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 03-10-2026 | Set measurable KPIs: 15% reduction in delivery delays, 10% cost reduction
+- T009 | Vendor evaluation for ML platform | Status: To Do | Assignee: James Wong | Sprint: Sprint 3 | Due: 06-10-2026 | Compare cloud ML platforms (AWS SageMaker, Azure ML, GCP Vertex AI)
+- T010 | Collect historical demand data | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 13-10-2026 | Extract 2 years of demand data from ERP system
+- T011 | Data cleaning and preprocessing pipeline | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 20-10-2026 | Build automated pipeline for data cleaning, normalization, feature engineering
+- T012 | Design demand forecasting model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 4 | Due: 20-10-2026 | Select algorithm (LSTM, Prophet, XGBoost), define input features
+- T013 | Design route optimization model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 27-10-2026 | Graph-based optimization with constraints (time windows, vehicle capacity)
+- T024 | Security review of AI infrastructure | Status: Blocked | Assignee: James Wong | Sprint: Sprint 5 | Due: 27-10-2026 | Penetration testing and vulnerability assessment - BLOCKED: waiting for security team availability
+- T014 | Build model training pipeline | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 03-11-2026 | Automated training, validation, and model versioning
+- T015 | Deploy demand model to test environment | Status: To Do | Assignee: James Wong | Sprint: Sprint 6 | Due: 10-11-2026 | Deploy to staging, set up monitoring, define test scenarios
+- T016 | Run pilot with logistics team | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 6 | Due: 17-11-2026 | 2-week pilot with 3 logistics coordinators using demand forecasting predictions
+- T017 | Collect pilot feedback and metrics | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 7 | Due: 24-11-2026 | Survey users, measure prediction accuracy, compare with manual forecasts
+- T018 | Iterate on model based on feedback | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 7 | Due: 01-12-2026 | Adjust features, retrain model, validate improvements
+- T019 | Prepare production deployment plan | Status: To Do | Assignee: James Wong | Sprint: Sprint 8 | Due: 08-12-2026 | Infrastructure scaling, rollback plan, monitoring setup
+- T020 | Staff training program | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 8 | Due: 15-12-2026 | Train 25 logistics staff on using AI-powered forecasting dashboard
+- T021 | Full production rollout | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 9 | Due: 22-12-2026 | Go-live for demand forecasting across all 3 distribution centers
+- T022 | Set up continuous monitoring | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 9 | Due: 29-12-2026 | Model performance dashboards, drift detection alerts, retraining triggers
+- T023 | Project closure report | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 10 | Due: 05-01-2027 | Final report: outcomes vs targets, lessons learned, recommendations for Phase 2
+- T026 | Complete staff training rollout (remaining sites) | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 11 | Due: 25-01-2027 | Extend AI dashboard training to remaining 2 distribution centers
+- T027 | Full production rollout sign-off (all distribution centers) | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 11 | Due: 25-01-2027 | Formal go-live confirmation across all 3 distribution centers
+- T028 | Monitor model performance post-launch | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 12 | Due: 08-02-2027 | Track live prediction accuracy and drift against baseline for 2 weeks post go-live
+- T029 | Conduct final project review workshop | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 08-02-2027 | Stakeholder workshop: outcomes vs targets, lessons learned
+- T030 | Publish recommendations for Phase 2 scaling | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 14-02-2027 | Final recommendations report for scaling AI adoption beyond pilot departments
+</task_board>",grounded,"Project plan with phases, milestones, timeline, and deliverables, grounded in the project description",15% delivery delay reduction; 10% operational cost reduction; cross-functional task force,,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.",,"Must include phases, milestones, timeline. Must be grounded in the actual project description.",Must NOT invent goals not in the description.,"???I am generating a project plan for the AI Adoption Project at ABCDE Ltd., based on the project description and task details retrieved. The plan will outline key phases, activities, and milestones necessary to achieve the project's goals, including reducing delivery delays by 15% and lowering operational costs by 10%.
+
+???Here's the project plan:
+### Project Initiation (31-08-2026 to 08-09-2026)
+Activities: Define project scope and objectives, Form cross-functional task force
+Milestones: Project scope and objectives defined, Cross-functional task force established
+Deliverables: Documented project scope and goals, Onboarded team members from data science, IT, and business units
+
+### Assessment and Analysis (31-08-2026 to 22-09-2026)
+Activities: Audit existing data infrastructure, Identify data gaps and quality issues
+Milestones: Data infrastructure audited, Data gap analysis report completed
+Deliverables: Assessment report on current databases and data quality, Gap analysis report comparing available data vs requirements for AI models
+
+### Use Case Development (28-09-2026 to 06-10-2026)
+Activities: Shortlist AI use cases, Vendor evaluation for ML platform, Legal review of data usage
+Milestones: AI use cases shortlisted, ML platform vendors evaluated, Data usage compliance reviewed
+Deliverables: Prioritized list of AI use cases, Comparison report of cloud ML platforms, Compliance report for data privacy
+
+### Pilot Design (12-10-2026 to 08-11-2026)
+Activities: Establish data pipelines
+Milestones: Data pipelines established
+Deliverables: Functional data pipelines ready for pilot implementation
+
+### Pilot Implementation (09-11-2026 to 06-12-2026)
+Activities: Collect user feedback and performance metrics
+Milestones: User feedback and performance metrics collected
+Deliverables: Report on pilot performance and user feedback
+
+### Training and Rollout (07-12-2026 to 25-01-2027)
+Activities: Staff training program, Complete staff training rollout (remaining sites)
+Milestones: Training program completed for initial staff, Training extended to remaining distribution centers
+Deliverables: Trained logistics staff on AI-powered forecasting dashboard, Training completion report for all sites"
+T2,N11: Planner Agent,Plan (vague),Generate a project plan for: 'We want to build a chatbot.',"No project records exist for a project called 'build a chatbot'. This request does not match ABCDE Ltd. or any project in the task board, timeline, or risk register. No grounding data is available.",vague,"A clarifying question about scope, timeline, and team size â€” no invented project plan",,,"Brief -- a short clarifying question (1-3 sentences), no fabricated content.",,"Must flag as insufficient detail. Must ask for scope, timeline, team size.",Must NOT generate a full plan from one sentence.,"??I need a bit more detail to generate a plan. 
+
+Here's what's missing: Specific scope and goals, Timeline, Team size. 
+
+Could you share the project's scope and timeline?"
+T3,N16: Risk Assessor Agent,Risk (detailed),Generate a risk assessment for the AI Adoption Project at ABCDE Ltd.,"<project_description>
+ABCDE Ltd. is a mid-sized logistics and supply chain company running an AI adoption initiative to improve operational efficiency, customer experience, and data-driven decision-making. Focus areas: demand forecasting, route optimization, inventory management, and customer support. Phased rollout: workflow/data assessment, then pilot implementations. Goals: reduce delivery delays by 15%, lower operational costs by 10%, improve service responsiveness. Overseen by a cross-functional task force (data scientists, IT, business stakeholders).
+</project_description>
+
+<risk_register>
+- R01 | Category: Data Quality & Availability | Risk: Incomplete or unstructured data | Impact: Poor model performance and inaccurate outcomes | Mitigation: Perform early data audits and implement robust data governance | Status: Open
+- R02 | Category: Integration Issues | Risk: Difficulty integrating AI with legacy systems | Impact: Delays in deployment and operational disruptions | Mitigation: Plan integration roadmap and use APIs/middleware | Status: Open
+- R03 | Category: Talent & Skills Gap | Risk: Lack of internal AI/ML expertise | Impact: Overreliance on external vendors and slow progress | Mitigation: Provide staff training and hire specialized talent | Status: Open
+- R04 | Category: Change Resistance | Risk: Employees resist adopting AI-driven workflows | Impact: Low adoption and reduced ROI | Mitigation: Strong change management and early engagement | Status: Open
+- R05 | Category: Ethical & Legal Concerns | Risk: Risks of biased models or data privacy violations | Impact: Legal repercussions and reputational damage | Mitigation: Involve legal early and implement fairness checks | Status: Open
+- R06 | Category: Cost Overruns | Risk: Underestimation of AI development costs | Impact: Budget constraints and project delays | Mitigation: Set realistic budget and build in contingency funds | Status: Open
+- R07 | Category: Unrealistic Expectations | Risk: Stakeholders expect immediate ROI | Impact: Disillusionment and loss of support | Mitigation: Align expectations and show quick wins | Status: Open
+- R08 | Category: Model Performance Drift | Risk: AI models lose accuracy over time | Impact: Incorrect decisions and trust erosion | Mitigation: Regular retraining cycles and monitoring dashboards | Status: Open
+- R09 | Category: Security Vulnerabilities | Risk: AI models targeted by adversarial attacks | Impact: Data breaches and operational risks | Mitigation: Adopt AI security best practices and penetration testing | Status: Open
+- R10 | Category: Vendor Lock-in | Risk: Overdependence on a specific AI platform | Impact: Flexibility loss and future switching costs | Mitigation: Favor open standards and negotiate flexible vendor terms | Status: Open
+- R11 | Category: Talent & Skills Gap | Risk: Inability to hire reliable trainers due to budget constraints | Impact: Insufficient internal knowledge transfer and slow upskilling of staff | Mitigation: Explore cost-effective training options such as online courses and internal knowledge-sharing sessions | Status: Open
+</risk_register>
+
+<timeline>
+- M01 | Phase 1: Project Initiation | Team structure finalized | Status: Done | Owner: Arjun Mehta | 31-08-2026 to 13-09-2026
+- M02 | Phase 1: Project Initiation | Project charter signed off | Status: Done | Owner: Arjun Mehta | 31-08-2026 to 13-09-2026
+- M03 | Phase 2: Current State Analysis | Current systems audit report | Status: Done | Owner: Priya Nair | 14-09-2026 to 27-09-2026
+- M04 | Phase 2: Current State Analysis | Gap analysis report | Status: In Progress | Owner: Priya Nair | 14-09-2026 to 27-09-2026
+- M05 | Phase 3: Use Case Selection | Final prioritized use case list with success criteria | Status: In Progress | Owner: Arjun Mehta | 28-09-2026 to 11-10-2026
+- M06 | Phase 4: Pilot Design | Data pipelines established | Status: Not Started | Owner: Priya Nair | 12-10-2026 to 08-11-2026
+- M07 | Phase 4: Pilot Design | Working prototype models | Status: Not Started | Owner: Ravi Kumar | 12-10-2026 to 08-11-2026
+- M08 | Phase 5: Pilot Implementation | Pilot results report | Status: Not Started | Owner: James Wong | 09-11-2026 to 06-12-2026
+- M09 | Phase 5: Pilot Implementation | User feedback and performance metrics | Status: Not Started | Owner: Sarah Lin | 09-11-2026 to 06-12-2026
+- M10 | Phase 6: Evaluation & Iteration | Updated models and process refinements | Status: Not Started | Owner: Ravi Kumar | 07-12-2026 to 20-12-2026
+- M11 | Phase 7: Full Deployment | Full production rollout | Status: Not Started | Owner: Arjun Mehta | 21-12-2026 to 31-01-2027
+- M12 | Phase 7: Full Deployment | Training sessions completed | Status: Not Started | Owner: Sarah Lin | 21-12-2026 to 31-01-2027
+- M13 | Phase 8: Monitoring & Review | Project closure report | Status: Not Started | Owner: Arjun Mehta | 01-02-2027 to 14-02-2027
+- M14 | Phase 8: Monitoring & Review | Recommendations for future scaling | Status: Not Started | Owner: Arjun Mehta | 01-02-2027 to 14-02-2027
+</timeline>
+
+<task_board>
+- T001 | Define project scope and objectives | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 08-09-2026 | Document project scope, goals, and success criteria for AI adoption
+- T002 | Form cross-functional task force | Status: Done | Assignee: Sarah Lin | Sprint: Sprint 1 | Due: 08-09-2026 | Identify and onboard team members from data science, IT, and business units
+- T003 | Initial stakeholder alignment meeting | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 11-09-2026 | Present project charter and get sign-off from leadership
+- T004 | Audit existing data infrastructure | Status: Done | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 19-09-2026 | Assess current databases, data pipelines, and data quality
+- T005 | Map current logistics workflows | Status: Done | Assignee: James Wong | Sprint: Sprint 2 | Due: 19-09-2026 | Document end-to-end processes for demand forecasting, routing, and inventory
+- T006 | Identify data gaps and quality issues | Status: In Progress | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 22-09-2026 | Gap analysis report comparing available data vs requirements for AI models
+- T007 | Shortlist AI use cases | Status: In Progress | Assignee: Arjun Mehta | Sprint: Sprint 3 | Due: 29-09-2026 | Evaluate and prioritize: demand forecasting, route optimization, inventory mgmt, customer support
+- T025 | Legal review of data usage | Status: In Progress | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 29-09-2026 | Review data privacy compliance for using customer delivery data in ML models
+- T008 | Define success criteria for each use case | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 03-10-2026 | Set measurable KPIs: 15% reduction in delivery delays, 10% cost reduction
+- T009 | Vendor evaluation for ML platform | Status: To Do | Assignee: James Wong | Sprint: Sprint 3 | Due: 06-10-2026 | Compare cloud ML platforms (AWS SageMaker, Azure ML, GCP Vertex AI)
+- T010 | Collect historical demand data | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 13-10-2026 | Extract 2 years of demand data from ERP system
+- T011 | Data cleaning and preprocessing pipeline | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 20-10-2026 | Build automated pipeline for data cleaning, normalization, feature engineering
+- T012 | Design demand forecasting model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 4 | Due: 20-10-2026 | Select algorithm (LSTM, Prophet, XGBoost), define input features
+- T013 | Design route optimization model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 27-10-2026 | Graph-based optimization with constraints (time windows, vehicle capacity)
+- T024 | Security review of AI infrastructure | Status: Blocked | Assignee: James Wong | Sprint: Sprint 5 | Due: 27-10-2026 | Penetration testing and vulnerability assessment - BLOCKED: waiting for security team availability
+- T014 | Build model training pipeline | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 03-11-2026 | Automated training, validation, and model versioning
+- T015 | Deploy demand model to test environment | Status: To Do | Assignee: James Wong | Sprint: Sprint 6 | Due: 10-11-2026 | Deploy to staging, set up monitoring, define test scenarios
+- T016 | Run pilot with logistics team | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 6 | Due: 17-11-2026 | 2-week pilot with 3 logistics coordinators using demand forecasting predictions
+- T017 | Collect pilot feedback and metrics | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 7 | Due: 24-11-2026 | Survey users, measure prediction accuracy, compare with manual forecasts
+- T018 | Iterate on model based on feedback | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 7 | Due: 01-12-2026 | Adjust features, retrain model, validate improvements
+- T019 | Prepare production deployment plan | Status: To Do | Assignee: James Wong | Sprint: Sprint 8 | Due: 08-12-2026 | Infrastructure scaling, rollback plan, monitoring setup
+- T020 | Staff training program | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 8 | Due: 15-12-2026 | Train 25 logistics staff on using AI-powered forecasting dashboard
+- T021 | Full production rollout | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 9 | Due: 22-12-2026 | Go-live for demand forecasting across all 3 distribution centers
+- T022 | Set up continuous monitoring | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 9 | Due: 29-12-2026 | Model performance dashboards, drift detection alerts, retraining triggers
+- T023 | Project closure report | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 10 | Due: 05-01-2027 | Final report: outcomes vs targets, lessons learned, recommendations for Phase 2
+- T026 | Complete staff training rollout (remaining sites) | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 11 | Due: 25-01-2027 | Extend AI dashboard training to remaining 2 distribution centers
+- T027 | Full production rollout sign-off (all distribution centers) | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 11 | Due: 25-01-2027 | Formal go-live confirmation across all 3 distribution centers
+- T028 | Monitor model performance post-launch | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 12 | Due: 08-02-2027 | Track live prediction accuracy and drift against baseline for 2 weeks post go-live
+- T029 | Conduct final project review workshop | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 08-02-2027 | Stakeholder workshop: outcomes vs targets, lessons learned
+- T030 | Publish recommendations for Phase 2 scaling | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 14-02-2027 | Final recommendations report for scaling AI adoption beyond pilot departments
+</task_board>",grounded,"Risk assessment listing categories, impact, and mitigation, grounded in the risk register",R01;R02;R03;R04;R05;R06;R07;R08;R09;R10;R11,R01;R02;R03;R04;R05;R06;R07;R08;R09;R10;R11,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.",,Must produce categorized risks relevant to logistics/AI.,Must NOT include generic risks unrelated to project.,"??Here are the relevant risks for the AI Adoption Project at ABCDE Ltd (all already tracked in the register).
+
+
+- Incomplete or unstructured data [Data Quality & Availability] Impact: Poor model performance and inaccurate outcomes; Mitigation: Perform early data audits and implement robust data governance
+- Difficulty integrating AI with legacy systems [Integration Issues] Impact: Delays in deployment and operational disruptions; Mitigation: Plan integration roadmap and use APIs/middleware
+- Lack of internal AI/ML expertise [Talent & Skills Gap] Impact: Overreliance on external vendors and slow progress; Mitigation: Provide staff training and hire specialized talent
+- Employees resist adopting AI-driven workflows [Change Resistance] Impact: Low adoption and reduced ROI; Mitigation: Strong change management and early engagement
+- Risks of biased models or data privacy violations [Ethical & Legal Concerns] Impact: Legal repercussions and reputational damage; Mitigation: Involve legal early and implement fairness checks
+- Underestimation of AI development costs [Cost Overruns] Impact: Budget constraints and project delays; Mitigation: Set realistic budget and build in contingency funds
+- AI models lose accuracy over time [Model Performance Drift] Impact: Incorrect decisions and trust erosion; Mitigation: Regular retraining cycles and monitoring dashboards
+- AI models targeted by adversarial attacks [Security Vulnerabilities] Impact: Data breaches and operational risks; Mitigation: Adopt AI security best practices and penetration testing"
+T4,N16: Risk Assessor Agent,Risk (vague),Generate a risk assessment for: 'New project starting soon.',"No project records exist for a project described only as 'New project starting soon.' This does not match ABCDE Ltd. or any project in the risk register, timeline, or task board. No grounding data is available.",vague,A clarifying question about project scope â€” no invented risks,,,"Brief -- a short clarifying question (1-3 sentences), no fabricated content.",,Must flag as insufficient. Must ask for project details.,Must NOT invent project-specific risks from nothing.,"??I need more detail to assess risk properly. 
+
+Here's what's missing: Specific project name or details about the new project.. 
+
+Could you share more specifics for the details you are looking for?"
+T5,N25: Status Reporter Agent,Status (data),Generate a weekly status report using the sample task board for Sprint 3.,"<task_board_sprint_3>
+- T007 | Shortlist AI use cases | Status: In Progress | Assignee: Arjun Mehta | Sprint: Sprint 3 | Due: 29-09-2026 | Evaluate and prioritize: demand forecasting, route optimization, inventory mgmt, customer support
+- T025 | Legal review of data usage | Status: In Progress | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 29-09-2026 | Review data privacy compliance for using customer delivery data in ML models
+- T008 | Define success criteria for each use case | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 03-10-2026 | Set measurable KPIs: 15% reduction in delivery delays, 10% cost reduction
+- T009 | Vendor evaluation for ML platform | Status: To Do | Assignee: James Wong | Sprint: Sprint 3 | Due: 06-10-2026 | Compare cloud ML platforms (AWS SageMaker, Azure ML, GCP Vertex AI)
+</task_board_sprint_3>
+
+<timeline_relevant_milestone>
+- M05 | Phase 3: Use Case Selection | Final prioritized use case list with success criteria | Status: In Progress | Owner: Arjun Mehta | 28-09-2026 to 11-10-2026
+</timeline_relevant_milestone>
+
+<as_of_date_note>
+The source application's internal 'current date' used for at-risk calculations could not be determined from available data and appears inconsistent (see known_reference_output_flags). Treat any 'overdue'/'at risk' claim as needing explicit justification against real due dates in the task board above, not just trusting the label.
+</as_of_date_note>",grounded,"Status report covering Sprint 3 tasks only, grounded in the task board",T007;T025;T008;T009,T007;T025;T008;T009,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.",,Must show tasks by status. Must reference actual task names from CSV.,Must NOT invent tasks.,"???Scoped to Sprint 3 � 4 tasks found.
+
+??Status report for Sprint 3 (overall health: Red):
+To do: T007 - Shortlist AI use cases, T025 - Legal review of data usage, T008 - Define success criteria for each use case, T009 - Vendor evaluation for ML platform"
+T6,N25: Status Reporter Agent,Status (no data),Generate a weekly status report for: 'Things are going fine.',"No task board, timeline, or status data was supplied. The input 'Things are going fine.' is a vague, informal statement with no verifiable project data attached.",vague,A clarifying question or explicit statement that no status data was provided â€” no invented status,,,"Brief -- a short clarifying question (1-3 sentences), no fabricated content.",,Must ask the user to clarify what they'd like a status update on. ,Must NOT generate a full report (done/ in_progress/ to_do/ blocked/ at_risk/ upcoming_milestones must all be empty). Must NOT fabricate task statuses or progress percentages.,???Could you share more details on what you'd like a status update on?
+T7,N16: Risk Assessor Agent,Risk analysis,What are the top 3 risks for the ABCDE Ltd project?,"<risk_register>
+- R01 | Category: Data Quality & Availability | Risk: Incomplete or unstructured data | Impact: Poor model performance and inaccurate outcomes | Mitigation: Perform early data audits and implement robust data governance | Status: Open
+- R02 | Category: Integration Issues | Risk: Difficulty integrating AI with legacy systems | Impact: Delays in deployment and operational disruptions | Mitigation: Plan integration roadmap and use APIs/middleware | Status: Open
+- R03 | Category: Talent & Skills Gap | Risk: Lack of internal AI/ML expertise | Impact: Overreliance on external vendors and slow progress | Mitigation: Provide staff training and hire specialized talent | Status: Open
+- R04 | Category: Change Resistance | Risk: Employees resist adopting AI-driven workflows | Impact: Low adoption and reduced ROI | Mitigation: Strong change management and early engagement | Status: Open
+- R05 | Category: Ethical & Legal Concerns | Risk: Risks of biased models or data privacy violations | Impact: Legal repercussions and reputational damage | Mitigation: Involve legal early and implement fairness checks | Status: Open
+- R06 | Category: Cost Overruns | Risk: Underestimation of AI development costs | Impact: Budget constraints and project delays | Mitigation: Set realistic budget and build in contingency funds | Status: Open
+- R07 | Category: Unrealistic Expectations | Risk: Stakeholders expect immediate ROI | Impact: Disillusionment and loss of support | Mitigation: Align expectations and show quick wins | Status: Open
+- R08 | Category: Model Performance Drift | Risk: AI models lose accuracy over time | Impact: Incorrect decisions and trust erosion | Mitigation: Regular retraining cycles and monitoring dashboards | Status: Open
+- R09 | Category: Security Vulnerabilities | Risk: AI models targeted by adversarial attacks | Impact: Data breaches and operational risks | Mitigation: Adopt AI security best practices and penetration testing | Status: Open
+- R10 | Category: Vendor Lock-in | Risk: Overdependence on a specific AI platform | Impact: Flexibility loss and future switching costs | Mitigation: Favor open standards and negotiate flexible vendor terms | Status: Open
+- R11 | Category: Talent & Skills Gap | Risk: Inability to hire reliable trainers due to budget constraints | Impact: Insufficient internal knowledge transfer and slow upskilling of staff | Mitigation: Explore cost-effective training options such as online courses and internal knowledge-sharing sessions | Status: Open
+</risk_register>",grounded,"Top 3 risks ranked by severity, drawn only from the risk register",,R01;R02;R03;R04;R05;R06;R07;R08;R09;R10;R11,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.",,Must reference actual risks from risk CSV.,Must NOT invent risks not in the data.,"??Here are the top 3 risks for the ABCDE Ltd project, ranked by severity.
+
+- Incomplete or unstructured data [Data Quality & Availability] Impact: Poor model performance and inaccurate outcomes; Mitigation: Perform early data audits and implement robust data governance
+- Difficulty integrating AI with legacy systems [Integration Issues] Impact: Delays in deployment and operational disruptions; Mitigation: Plan integration roadmap and use APIs/middleware
+- Lack of internal AI/ML expertise [Talent & Skills Gap] Impact: Overreliance on external vendors and slow progress; Mitigation: Provide staff training and hire specialized talent"
+T8,N25: Status Reporter Agent,Tracking,Which tasks are blocked or at risk of missing their deadline?,"<task_board_blocked_or_in_progress>
+- T006 | Identify data gaps and quality issues | Status: In Progress | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 22-09-2026 | Gap analysis report comparing available data vs requirements for AI models
+- T007 | Shortlist AI use cases | Status: In Progress | Assignee: Arjun Mehta | Sprint: Sprint 3 | Due: 29-09-2026 | Evaluate and prioritize: demand forecasting, route optimization, inventory mgmt, customer support
+- T025 | Legal review of data usage | Status: In Progress | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 29-09-2026 | Review data privacy compliance for using customer delivery data in ML models
+- T024 | Security review of AI infrastructure | Status: Blocked | Assignee: James Wong | Sprint: Sprint 5 | Due: 27-10-2026 | Penetration testing and vulnerability assessment - BLOCKED: waiting for security team availability
+</task_board_blocked_or_in_progress>
+
+<full_task_board>
+- T001 | Define project scope and objectives | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 08-09-2026 | Document project scope, goals, and success criteria for AI adoption
+- T002 | Form cross-functional task force | Status: Done | Assignee: Sarah Lin | Sprint: Sprint 1 | Due: 08-09-2026 | Identify and onboard team members from data science, IT, and business units
+- T003 | Initial stakeholder alignment meeting | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 11-09-2026 | Present project charter and get sign-off from leadership
+- T004 | Audit existing data infrastructure | Status: Done | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 19-09-2026 | Assess current databases, data pipelines, and data quality
+- T005 | Map current logistics workflows | Status: Done | Assignee: James Wong | Sprint: Sprint 2 | Due: 19-09-2026 | Document end-to-end processes for demand forecasting, routing, and inventory
+- T006 | Identify data gaps and quality issues | Status: In Progress | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 22-09-2026 | Gap analysis report comparing available data vs requirements for AI models
+- T007 | Shortlist AI use cases | Status: In Progress | Assignee: Arjun Mehta | Sprint: Sprint 3 | Due: 29-09-2026 | Evaluate and prioritize: demand forecasting, route optimization, inventory mgmt, customer support
+- T025 | Legal review of data usage | Status: In Progress | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 29-09-2026 | Review data privacy compliance for using customer delivery data in ML models
+- T008 | Define success criteria for each use case | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 03-10-2026 | Set measurable KPIs: 15% reduction in delivery delays, 10% cost reduction
+- T009 | Vendor evaluation for ML platform | Status: To Do | Assignee: James Wong | Sprint: Sprint 3 | Due: 06-10-2026 | Compare cloud ML platforms (AWS SageMaker, Azure ML, GCP Vertex AI)
+- T010 | Collect historical demand data | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 13-10-2026 | Extract 2 years of demand data from ERP system
+- T011 | Data cleaning and preprocessing pipeline | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 20-10-2026 | Build automated pipeline for data cleaning, normalization, feature engineering
+- T012 | Design demand forecasting model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 4 | Due: 20-10-2026 | Select algorithm (LSTM, Prophet, XGBoost), define input features
+- T013 | Design route optimization model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 27-10-2026 | Graph-based optimization with constraints (time windows, vehicle capacity)
+- T024 | Security review of AI infrastructure | Status: Blocked | Assignee: James Wong | Sprint: Sprint 5 | Due: 27-10-2026 | Penetration testing and vulnerability assessment - BLOCKED: waiting for security team availability
+- T014 | Build model training pipeline | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 03-11-2026 | Automated training, validation, and model versioning
+- T015 | Deploy demand model to test environment | Status: To Do | Assignee: James Wong | Sprint: Sprint 6 | Due: 10-11-2026 | Deploy to staging, set up monitoring, define test scenarios
+- T016 | Run pilot with logistics team | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 6 | Due: 17-11-2026 | 2-week pilot with 3 logistics coordinators using demand forecasting predictions
+- T017 | Collect pilot feedback and metrics | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 7 | Due: 24-11-2026 | Survey users, measure prediction accuracy, compare with manual forecasts
+- T018 | Iterate on model based on feedback | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 7 | Due: 01-12-2026 | Adjust features, retrain model, validate improvements
+- T019 | Prepare production deployment plan | Status: To Do | Assignee: James Wong | Sprint: Sprint 8 | Due: 08-12-2026 | Infrastructure scaling, rollback plan, monitoring setup
+- T020 | Staff training program | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 8 | Due: 15-12-2026 | Train 25 logistics staff on using AI-powered forecasting dashboard
+- T021 | Full production rollout | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 9 | Due: 22-12-2026 | Go-live for demand forecasting across all 3 distribution centers
+- T022 | Set up continuous monitoring | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 9 | Due: 29-12-2026 | Model performance dashboards, drift detection alerts, retraining triggers
+- T023 | Project closure report | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 10 | Due: 05-01-2027 | Final report: outcomes vs targets, lessons learned, recommendations for Phase 2
+- T026 | Complete staff training rollout (remaining sites) | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 11 | Due: 25-01-2027 | Extend AI dashboard training to remaining 2 distribution centers
+- T027 | Full production rollout sign-off (all distribution centers) | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 11 | Due: 25-01-2027 | Formal go-live confirmation across all 3 distribution centers
+- T028 | Monitor model performance post-launch | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 12 | Due: 08-02-2027 | Track live prediction accuracy and drift against baseline for 2 weeks post go-live
+- T029 | Conduct final project review workshop | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 08-02-2027 | Stakeholder workshop: outcomes vs targets, lessons learned
+- T030 | Publish recommendations for Phase 2 scaling | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 14-02-2027 | Final recommendations report for scaling AI adoption beyond pilot departments
+</full_task_board>
+
+<as_of_date_note>
+The source application's internal 'current date' used for at-risk calculations could not be determined from available data and appears inconsistent (see known_reference_output_flags). Treat any 'overdue'/'at risk' claim as needing explicit justification against real due dates in the task board above, not just trusting the label.
+</as_of_date_note>
+
+<app_at_risk_logic_note>
+Confirmed from workflow source (N26d): ""at risk"" is computed as status != Done AND due_date < today, where ""today"" is the REAL wall-clock date at the moment the workflow executes (JavaScript `new Date()`) -- not a fixed project-simulation date. This computation only runs as a backstop when the agent's own at_risk list comes back empty; if the agent returns a non-empty (possibly wrong) list, it is never corrected or validated. Do NOT assume a fixed ""as of"" date for grading this row -- the correct at-risk set must be computed at evaluation time using the actual current date against real due dates, since it changes daily. Any specific hardcoded ""expected at-risk list"" will go stale.
+</app_at_risk_logic_note>",grounded,"List of blocked or at-risk tasks with task IDs and reasons, grounded in the task board",,T001;T002;T003;T004;T005;T006;T007;T008;T009;T010;T011;T012;T013;T014;T015;T016;T017;T018;T019;T020;T021;T022;T023;T024;T025;T026;T027;T028;T029;T030,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.","CONFIRMED FROM SOURCE CODE (N26d): the deterministic at-risk fix only activates when the LLM's own at_risk array is empty -- it never validates or corrects a non-empty list. Since this row's captured output already had a populated at_risk array, the safety net never fired; the inconsistent entries (tasks due weeks/months apart, some earlier-due tasks omitted) are unfiltered LLM output, not a regression from a recent code change. Also: at-risk is computed against the real wall-clock date at runtime, not a fixed project date -- see app_at_risk_logic_note in context. Recommend either (a) extending N26d to always recompute at_risk deterministically regardless of whether the LLM's list is empty, or (b) grading this row with a dynamically-computed expected set rather than a fixed key_facts_expected.","Must identify T024 (Security review, BLOCKED). Must check due dates against current progress.",Must NOT omit T024 or return an empty blocked list.,"???Scoped to All Sprints � 1 blocked, 1 at risk.
+
+??Status report for All Sprints (overall health: Red):
+Blocked: T024 - Security review of AI infrastructure (Blocked: waiting for security team availability)
+At risk: T005 - Map current logistics workflows (Due date (19-09-2026) has passed)"
+T9,N11: Planner Agent,Plan (edge),Generate a project plan for a 2-week project with no other details.,"No project records exist for a generic '2-week project with no other details.' This does not correspond to any entry in the task board, timeline, or risk register. No grounding data is available.",vague,A clarifying question due to insufficient project detail â€” no invented plan,,,"Brief -- a short clarifying question (1-3 sentences), no fabricated content.",,"Must ask for scope, goals, deliverables.",Must NOT generate detailed plan from timeline alone.,"??I need a bit more detail to generate a plan. 
+
+Here's what's missing: specific project scope, goals, deliverables. 
+
+Could you share the project's scope and timeline?"
+T10,N25: Status Reporter Agent,Status summary,"Summarize current project status: tasks done, in progress, to do, blocked?","<full_task_board>
+- T001 | Define project scope and objectives | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 08-09-2026 | Document project scope, goals, and success criteria for AI adoption
+- T002 | Form cross-functional task force | Status: Done | Assignee: Sarah Lin | Sprint: Sprint 1 | Due: 08-09-2026 | Identify and onboard team members from data science, IT, and business units
+- T003 | Initial stakeholder alignment meeting | Status: Done | Assignee: Arjun Mehta | Sprint: Sprint 1 | Due: 11-09-2026 | Present project charter and get sign-off from leadership
+- T004 | Audit existing data infrastructure | Status: Done | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 19-09-2026 | Assess current databases, data pipelines, and data quality
+- T005 | Map current logistics workflows | Status: Done | Assignee: James Wong | Sprint: Sprint 2 | Due: 19-09-2026 | Document end-to-end processes for demand forecasting, routing, and inventory
+- T006 | Identify data gaps and quality issues | Status: In Progress | Assignee: Priya Nair | Sprint: Sprint 2 | Due: 22-09-2026 | Gap analysis report comparing available data vs requirements for AI models
+- T007 | Shortlist AI use cases | Status: In Progress | Assignee: Arjun Mehta | Sprint: Sprint 3 | Due: 29-09-2026 | Evaluate and prioritize: demand forecasting, route optimization, inventory mgmt, customer support
+- T025 | Legal review of data usage | Status: In Progress | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 29-09-2026 | Review data privacy compliance for using customer delivery data in ML models
+- T008 | Define success criteria for each use case | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 3 | Due: 03-10-2026 | Set measurable KPIs: 15% reduction in delivery delays, 10% cost reduction
+- T009 | Vendor evaluation for ML platform | Status: To Do | Assignee: James Wong | Sprint: Sprint 3 | Due: 06-10-2026 | Compare cloud ML platforms (AWS SageMaker, Azure ML, GCP Vertex AI)
+- T010 | Collect historical demand data | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 13-10-2026 | Extract 2 years of demand data from ERP system
+- T011 | Data cleaning and preprocessing pipeline | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 4 | Due: 20-10-2026 | Build automated pipeline for data cleaning, normalization, feature engineering
+- T012 | Design demand forecasting model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 4 | Due: 20-10-2026 | Select algorithm (LSTM, Prophet, XGBoost), define input features
+- T013 | Design route optimization model | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 27-10-2026 | Graph-based optimization with constraints (time windows, vehicle capacity)
+- T024 | Security review of AI infrastructure | Status: Blocked | Assignee: James Wong | Sprint: Sprint 5 | Due: 27-10-2026 | Penetration testing and vulnerability assessment - BLOCKED: waiting for security team availability
+- T014 | Build model training pipeline | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 5 | Due: 03-11-2026 | Automated training, validation, and model versioning
+- T015 | Deploy demand model to test environment | Status: To Do | Assignee: James Wong | Sprint: Sprint 6 | Due: 10-11-2026 | Deploy to staging, set up monitoring, define test scenarios
+- T016 | Run pilot with logistics team | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 6 | Due: 17-11-2026 | 2-week pilot with 3 logistics coordinators using demand forecasting predictions
+- T017 | Collect pilot feedback and metrics | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 7 | Due: 24-11-2026 | Survey users, measure prediction accuracy, compare with manual forecasts
+- T018 | Iterate on model based on feedback | Status: To Do | Assignee: Ravi Kumar | Sprint: Sprint 7 | Due: 01-12-2026 | Adjust features, retrain model, validate improvements
+- T019 | Prepare production deployment plan | Status: To Do | Assignee: James Wong | Sprint: Sprint 8 | Due: 08-12-2026 | Infrastructure scaling, rollback plan, monitoring setup
+- T020 | Staff training program | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 8 | Due: 15-12-2026 | Train 25 logistics staff on using AI-powered forecasting dashboard
+- T021 | Full production rollout | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 9 | Due: 22-12-2026 | Go-live for demand forecasting across all 3 distribution centers
+- T022 | Set up continuous monitoring | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 9 | Due: 29-12-2026 | Model performance dashboards, drift detection alerts, retraining triggers
+- T023 | Project closure report | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 10 | Due: 05-01-2027 | Final report: outcomes vs targets, lessons learned, recommendations for Phase 2
+- T026 | Complete staff training rollout (remaining sites) | Status: To Do | Assignee: Sarah Lin | Sprint: Sprint 11 | Due: 25-01-2027 | Extend AI dashboard training to remaining 2 distribution centers
+- T027 | Full production rollout sign-off (all distribution centers) | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 11 | Due: 25-01-2027 | Formal go-live confirmation across all 3 distribution centers
+- T028 | Monitor model performance post-launch | Status: To Do | Assignee: Priya Nair | Sprint: Sprint 12 | Due: 08-02-2027 | Track live prediction accuracy and drift against baseline for 2 weeks post go-live
+- T029 | Conduct final project review workshop | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 08-02-2027 | Stakeholder workshop: outcomes vs targets, lessons learned
+- T030 | Publish recommendations for Phase 2 scaling | Status: To Do | Assignee: Arjun Mehta | Sprint: Sprint 12 | Due: 14-02-2027 | Final recommendations report for scaling AI adoption beyond pilot departments
+</full_task_board>
+
+<timeline>
+- M01 | Phase 1: Project Initiation | Team structure finalized | Status: Done | Owner: Arjun Mehta | 31-08-2026 to 13-09-2026
+- M02 | Phase 1: Project Initiation | Project charter signed off | Status: Done | Owner: Arjun Mehta | 31-08-2026 to 13-09-2026
+- M03 | Phase 2: Current State Analysis | Current systems audit report | Status: Done | Owner: Priya Nair | 14-09-2026 to 27-09-2026
+- M04 | Phase 2: Current State Analysis | Gap analysis report | Status: In Progress | Owner: Priya Nair | 14-09-2026 to 27-09-2026
+- M05 | Phase 3: Use Case Selection | Final prioritized use case list with success criteria | Status: In Progress | Owner: Arjun Mehta | 28-09-2026 to 11-10-2026
+- M06 | Phase 4: Pilot Design | Data pipelines established | Status: Not Started | Owner: Priya Nair | 12-10-2026 to 08-11-2026
+- M07 | Phase 4: Pilot Design | Working prototype models | Status: Not Started | Owner: Ravi Kumar | 12-10-2026 to 08-11-2026
+- M08 | Phase 5: Pilot Implementation | Pilot results report | Status: Not Started | Owner: James Wong | 09-11-2026 to 06-12-2026
+- M09 | Phase 5: Pilot Implementation | User feedback and performance metrics | Status: Not Started | Owner: Sarah Lin | 09-11-2026 to 06-12-2026
+- M10 | Phase 6: Evaluation & Iteration | Updated models and process refinements | Status: Not Started | Owner: Ravi Kumar | 07-12-2026 to 20-12-2026
+- M11 | Phase 7: Full Deployment | Full production rollout | Status: Not Started | Owner: Arjun Mehta | 21-12-2026 to 31-01-2027
+- M12 | Phase 7: Full Deployment | Training sessions completed | Status: Not Started | Owner: Sarah Lin | 21-12-2026 to 31-01-2027
+- M13 | Phase 8: Monitoring & Review | Project closure report | Status: Not Started | Owner: Arjun Mehta | 01-02-2027 to 14-02-2027
+- M14 | Phase 8: Monitoring & Review | Recommendations for future scaling | Status: Not Started | Owner: Arjun Mehta | 01-02-2027 to 14-02-2027
+</timeline>
+
+<as_of_date_note>
+The source application's internal 'current date' used for at-risk calculations could not be determined from available data and appears inconsistent (see known_reference_output_flags). Treat any 'overdue'/'at risk' claim as needing explicit justification against real due dates in the task board above, not just trusting the label.
+</as_of_date_note>",grounded,"Full status breakdown across Done / In Progress / To Do / Blocked, grounded in the task board",,T001;T002;T003;T004;T005;T006;T007;T008;T009;T010;T011;T012;T013;T014;T015;T016;T017;T018;T019;T020;T021;T022;T023;T024;T025;T026;T027;T028;T029;T030,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.","CONFIRMED FROM SOURCE CODE (N26/N26d): the 'undefined - undefined' placeholder bug is fixed at the N26 normalization step (filters out entries missing task_id/task) -- this applies globally, so it's resolved for good. However, the deterministic re-bucketing in N26d that corrects task status against the real task board ONLY triggers when the request names a specific sprint (regex match on 'sprint <number>' in report_scope). This request ('all sprints') does not match that pattern, so T005's status is still sourced from the LLM's own classification, unvalidated -- this is why the Done/In Progress mix-up persists. Fix would require extending N26d's re-bucketing to also handle the 'all sprints' / no-specific-sprint case.",Must count correctly from task board CSV. Counts must match actual data.,Must NOT round or estimate counts.,"???Scoped to All Sprints � 4 done, 1 in progress, 24 to do, 1 blocked.
+
+??Status report for All Sprints (overall health: Amber):
+Done: T001 - Define project scope and objectives, T002 - Form cross-functional task force, T003 - Initial stakeholder alignment meeting, T004 - Audit existing data infrastructure
+In progress: T005 - Map current logistics workflows
+To do: T006 - Identify data gaps and quality issues, T007 - Shortlist AI use cases, T008 - Define success criteria for each use case, T009 - Vendor evaluation for ML platform, T010 - Collect historical demand data, T011 - Data cleaning and preprocessing pipeline, T012 - Design demand forecasting model, T013 - Design route optimization model, T014 - Build model training pipeline, T015 - Deploy demand model to test environment, T016 - Run pilot with logistics team, T017 - Collect pilot feedback and metrics, T018 - Iterate on model based on feedback, T019 - Prepare production deployment plan, T020 - Staff training program, T022 - Set up continuous monitoring, T023 - Project closure report, T025 - Legal review of data usage, T026 - Complete staff training rollout (remaining sites), T027 - Full production rollout sign-off (all distribution centers), T028 - Monitor model performance post-launch, T029 - Conduct final project review workshop, T030 - Publish recommendations for Phase 2 scaling, T021 - Full production rollout
+Blocked: T024 - Security review of AI infrastructure (waiting for security team availability)"
+T11,N25: Status Reporter Agent,Timeline,What milestones are coming up in the next 2 weeks?,"<timeline>
+M01 | Phase 1: Project Initiation | Team structure finalized | Status: Done | 31-08-2026 to 13-09-2026
+M02 | Phase 1: Project Initiation | Project charter signed off | Status: Done | 31-08-2026 to 13-09-2026
+M03 | Phase 2: Current State Analysis | Current systems audit report | Status: Done | 14-09-2026 to 27-09-2026
+M04 | Phase 2: Current State Analysis | Gap analysis report | Status: In Progress | 14-09-2026 to 27-09-2026
+M05 | Phase 3: Use Case Selection | Final prioritized use case list | Status: In Progress | 28-09-2026 to 11-10-2026
+M06 | Phase 4: Pilot Design | Data pipelines established | Status: Not Started | 12-10-2026 to 08-11-2026
+M07 | Phase 4: Pilot Design | Working prototype models | Status: Not Started | 12-10-2026 to 08-11-2026
+M08 | Phase 5: Pilot Implementation | Pilot results report | Status: Not Started | 09-11-2026 to 06-12-2026
+M09 | Phase 5: Pilot Implementation | User feedback and performance metrics | Status: Not Started | 09-11-2026 to 06-12-2026
+M10 | Phase 6: Evaluation & Iteration | Updated models and process refinements | Status: Not Started | 07-12-2026 to 20-12-2026
+M11 | Phase 7: Full Deployment | Full production rollout | Status: Not Started | 21-12-2026 to 31-01-2027
+M12 | Phase 7: Full Deployment | Training sessions completed | Status: Not Started | 21-12-2026 to 31-01-2027
+M13 | Phase 8: Monitoring & Review | Project closure report | Status: Not Started | 01-02-2027 to 14-02-2027
+M14 | Phase 8: Monitoring & Review | Recommendations for future scaling | Status: Not Started | 01-02-2027 to 14-02-2027
+</timeline>
+
+<as_of_date_note>
+Assume ""now"" falls within Sprint 3, approximately 29-09-2026, consistent with other status-reporting test rows in this dataset. ""Next 2 weeks"" therefore means the window 29-09-2026 to 13-10-2026. Only M05 (28-09 to 11-10-2026) clearly falls in this window; M04 is borderline (ends 27-09-2026, just before the window starts). All other milestones (M06 onward) are weeks to months away and must NOT be described as ""coming up soon.""
+</as_of_date_note>",grounded,"List of only the milestones genuinely due within the next 2 weeks (relative to the as_of_date), drawn strictly from the timeline -- likely just M05, possibly M04",M05,M01;M02;M03;M04;M05;M06;M07;M08;M09;M10;M11;M12;M13;M14,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.","CONFIRMED FROM SOURCE CODE (N26): the milestone-rescue logic only catches milestone-shaped objects misfiled into the wrong status bucket (done/in_progress/etc.) -- it does not validate that a milestone ID mentioned in upcoming_milestones is real, and does not check planned dates against a current-date window. No code currently protects against the 'M29' fabrication or the wrong-date-window issue found in the original captured output. This remains an open gap; would need a new validation node (e.g. cross-checking upcoming_milestones entries against the real timeline sheet, analogous to N26d for tasks) to fix.",Must reference only real milestone IDs from the timeline. Must reflect the correct planned date window relative to the current sprint.,Must NOT invent milestone IDs (e.g. confusing task IDs like T029 with a milestone ID). Must NOT describe milestones scheduled months away as imminent.,"???Scoped to All Sprints � 3 milestones found.
+
+??Status report for All Sprints (overall health: Green):
+Upcoming milestones: M14 - Recommendations for future scaling, M13 - Project closure report, M12 - Training sessions completed"
+T12,N30: Stakeholder Update Agent,Comms,Generate a stakeholder update email for Sprint 2 progress.,"<task_board_sprint_2>
+T004 | Audit existing data infrastructure | Status: Done | Assignee: Priya Nair | Due: 19-09-2026
+T005 | Map current logistics workflows | Status: Done | Assignee: James Wong | Due: 19-09-2026
+T006 | Identify data gaps and quality issues | Status: In Progress | Assignee: Priya Nair | Due: 22-09-2026
+</task_board_sprint_2>
+
+<timeline_relevant_milestones>
+M03 | Current systems audit report | Status: Done
+M04 | Gap analysis report | Status: In Progress
+</timeline_relevant_milestones>",grounded,"Professional stakeholder-facing email covering Sprint 2 tasks only (T004, T005, T006), with each task's status stated correctly per the task board",T004;T005;T006,T004;T005;T006,"Proportional detail -- cover the real content the request needs, without repetition or padding. Length should match the complexity of the request, not be artificially short or long.","CONFIRMED FROM SOURCE CODE: N30 (Stakeholder Update Agent) has no equivalent to N26/N26d's validation layer -- N31 (Parse Stakeholder Update) only parses JSON, with no task-board cross-check or normalization. The T005/T006 status mix-up found in the original captured output is therefore still fully exposed; there is no deterministic safety net for this agent yet, unlike N25's status reports.",Must reference Sprint 2 tasks. Must be professional. Must correctly state each task's actual status per the task board.,Must NOT include Sprint 3+ tasks. Must NOT misstate a task's completion status.,"?? *Sprint 2 Progress Update: Data Infrastructure and Workflow Mapping*
+
+Hello,
+
+In Sprint 2, we completed the audit of the existing data infrastructure (Task T004) and are currently progressing on mapping the current logistics workflows (Task T005). The task to identify data gaps and quality issues (Task T006) is still to be started. There are no reported blockers at this time. Next, we will focus on completing the gap analysis report and preparing for subsequent sprint activities.
+
+Best regards,
+Mira"

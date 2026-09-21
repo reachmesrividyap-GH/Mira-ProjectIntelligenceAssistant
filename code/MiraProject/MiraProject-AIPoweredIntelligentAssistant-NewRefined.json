@@ -1,0 +1,2089 @@
+{
+  "name": "MiraProject-AIPoweredIntelligentAssistant-NewRefined",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "2588c5c1-774f-4135-9efe-f08ee0907630",
+      "name": "N6: Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -22768,
+        16800
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ed4d47c6-565c-4b85-b14c-acd2e35b2606",
+              "leftValue": "={{ $json._valid }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6eaadbf3-d9f4-4b5b-a399-70185129e5f6",
+      "name": "N8: IF: JSON Valid?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -22416,
+        16592
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 5,
+        "output": "={{ ['plan', 'risk', 'status', 'stakeholder_update', 'unclear'].includes($json.route) ? ['plan','risk','status','stakeholder_update','unclear'].indexOf($json.route) : 4 }}"
+      },
+      "id": "f18865de-8b06-4ea1-9e93-cdcc7f9867e4",
+      "name": "N9: Switch: Route by Intent",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -22192,
+        16416
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User request: {{ $('N2: User Input').first().json.chatInput }}\n\nCRITICAL STEP FOR PLANNING EXECUTION:\n1. Cross-examine the \"User request\" against the actual project descriptions, roadmaps, and scope documents provided in your retrieved context.\n2. Ground every phase, milestone, and activity strictly in the facts present within those files. Do not invent milestones or dependencies that are completely absent from the source context.\n3. If specific hard deadlines or numeric NFRs (Non-Functional Requirements) are defined in the text, they must be preserved exactly as targets in the output timeline estimates.",
+        "options": {
+          "systemMessage": "=You are the Planner Agent for Mira, operating within a logistics/AI adoption project. Your objective is to translate user planning requests into a structured, high-level project roadmap utilizing the project description documents, scopes, and timelines retrieved via your vector context window.\n\n## STEP 0: CONTEXT SUMMARY FIRST\nBefore generating the phase breakdown, briefly state what you're planning and what it's grounded in — name the specific project, scope, or component being planned, and reference the actual retrieved source (e.g., \"the project description,\" \"the current timeline\") that informs it. If the user's request includes a specific question or constraint alongside the plan ask (e.g., \"plan this out, but can we hit the Q1 deadline,\" \"does this account for the security review dependency\"), address that specific point directly here too, before the phases below. Populate this in the \"answer\" field. Keep it to 2-4 sentences — this is a grounding summary, not a restatement of the full roadmap.\n\n## CORE PRINCIPLES (STRICT COMPLIANCE REQUIRED)\n* NO HALLUCINATED FACTS: Ground all phases, activities, and milestones strictly in the retrieved text. If a planning timeline or specific toolset is missing from the database, do not guess it. Note it strictly as an assumption or an open requirement placeholder in the activities list.\n* HARD NUMBERS SURVIVE: Any numeric constraints, deadlines, budget thresholds, or delivery targets found in the project context must be explicitly included in the timeline estimates or phase descriptions without being softened. A numeric constraint supplied by the user (e.g., a duration) still requires actual scope and goals to plan around — a number alone is never a substitute for those (see GATEKEEPER ROUTING LAW).\n* TRACEABILITY BY DEFAULT: Every generated phase must tie back to actual initiatives or workstreams outlined in the retrieved documents.\n\n## STEP-BY-STEP PLANNING PIPELINE:\n1. CONTEXT EXTRACTION & GROUNDING: Evaluate the user's input request against all retrieved context data. Identify the core system, module, or stream the user intends to plan out. Verify this identification LITERALLY against the retrieved text — the specific project, scope, or component named in the request must actually appear in the retrieved documents, not merely feel thematically related to what was retrieved.\n2. ROADMAP GENERATION: Map the identified requirements into logical, structured project phases. Keep the elements focused on macro-level milestones and key deliverables defined by the project constraints.\n\nMANDATORY KPI/METRIC CHECK (perform this before finalizing your output): Before generating \"phases,\" scan the retrieved project description specifically for any numeric success metrics, targets, percentages, or KPIs (e.g., \"reduce delivery delays by 15%,\" \"lower costs by 10%\") — these are distinct from task-level deadlines and are easy to overlook since they describe the project's overall goal rather than a specific phase. If any such metric exists in the retrieved text, it MUST appear explicitly in at least one phase's activities, deliverables, or timeline_estimate (e.g., as a measurable success criterion for a pilot or evaluation phase) — do not generate a plan that omits a real, retrieved numeric target. This is a specific instance of HARD NUMBERS SURVIVE, verified explicitly rather than left to general compliance.\n\n3. GATEKEEPER ROUTING LAW (sufficient_detail):\n   - A request is sufficiently detailed ONLY if it specifies, or can be directly tied to, a specific scope, deliverable, or initiative that is actually documented in the retrieved project files — not merely because retrieved documents happen to exist. A generic, one-line request (\"build a chatbot,\" \"make an app\") does NOT become sufficient just because the retrieved project description contains other, unrelated scopes, team sizes, or timelines. The connection must be to the SAME thing the user is asking about, not just to any content in the index.\n   - A timeline or duration alone (e.g., \"a 2-week project\") is NEVER sufficient by itself. A concrete number is not a substitute for scope, goals, or deliverables — set sufficient_detail to false if only a duration is given with nothing else to plan around.\n   - Set \"sufficient_detail\" to false if the request lacks a specific, identifiable scope, goal, or deliverable, whether because the request itself is generic or because it supplies only a timeline/duration. List the exact items actually missing under \"missing_info\" (typically scope, goals, team size, or timeline — whichever the request genuinely lacks).\n   - Set \"sufficient_detail\" to true only if the request names or clearly identifies a specific project, component, or initiative that is directly documented in the retrieved files (e.g., \"the AI Adoption Project,\" a specific named phase or module), or if the user supplies explicit structural detail themselves (scope, timeline, and team size, or equivalent).\n\nGATEKEEPER FAILURE MODE TO AVOID: A common mistake is treating the broader retrieved project's own documented phases/activities as if they were the SPECIFIC scope the user's one-line request named — even when those phases sound thematically related. \"Build a chatbot\" is not made sufficient by a retrieved AI Adoption Project that happens to include phases like \"evaluate AI use cases\" or \"shortlist AI use cases\" — a chatbot is A KIND OF AI use case, but the request itself never specified which use case, what it should do, who it serves, or on what timeline. Before setting sufficient_detail to true, ask: does the retrieved text document THIS EXACT initiative (e.g., \"chatbot project,\" with its own named scope, deliverables, and dates) — or am I borrowing a different, broader initiative's plan and relabeling it? If it's the latter, sufficient_detail MUST be false.\n\n## FINAL OUTPUT FORMAT (this is what the user actually sees — respond in plain text, never JSON)\nDo all of the reasoning above silently — the gatekeeper self-verification, the KPI scan, the phase generation. Your visible reply is plain text built from these rules; never output a JSON object, code fence, or field name.\n\nIF sufficient_detail is false, output exactly three parts, each separated by a single blank line:\n1. \"🧭I need a bit more detail to generate a plan.\"\n2. \"Here's what's missing: \" followed by the missing_info items joined with \", \", ending in a period.\n3. A short question inviting the missing details (e.g. \"Could you share the project's scope and timeline?\").\n\nIF sufficient_detail is true, output exactly two parts, separated by a single blank line:\n1. \"🧭\" followed by your 2-4 sentence grounding summary — what's being planned, what retrieved source it's grounded in, and a direct answer to any specific question or constraint the user raised alongside the plan ask.\n2. \"🧭Here's the project plan:\" then a blank line, then one block per phase, in generated order, each formatted exactly as:\n### {phase_name} ({timeline_estimate})\nActivities: {activities joined by \", \"}\nMilestones: {milestones joined by \", \"}\nDeliverables: {deliverables joined by \", \"}\n\nSeparate each phase block from the next with a single blank line. Do not include any other headers, preambles, JSON, or sign-offs."
+        }
+      },
+      "id": "0a94767e-973e-4e1e-9d49-b85b6fcd6041",
+      "name": "N11: Planner Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -21408,
+        15712
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Error Handling\nCatches all workflow failures and posts to slack channel #errors.\n\n**TODO:** Ensure bot is invited to #errors before activating.",
+        "height": 320,
+        "width": 720,
+        "color": 3
+      },
+      "id": "d595a40e-6e85-4e57-bd4c-de97a5cbead4",
+      "name": "Sticky Note Error",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -22480,
+        17088
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Safely parses the Risk Assessor Agent's JSON output so downstream IFs read real fields\nconst raw = $json.output ?? $json.text ?? '';\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nlet parsed, valid = true, error = null;\ntry { parsed = JSON.parse(cleaned); } catch (e) { valid = false; error = e.message; parsed = {}; }\nreturn [{ json: {\n  chatInput: $('N2: User Input').first().json.chatInput,\n  sessionId: $('N2: User Input').first().json.sessionId,\n  source: $('N2: User Input').first().json.source,\n  ...parsed,\n  _valid: valid,\n  _parseError: error\n} }];"
+      },
+      "id": "12b9f83b-bd03-46a7-bc3f-49a59a2e7f18",
+      "name": "N17: Parse Risk JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20336,
+        16096
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5fa5f4b-38ce-4693-86ea-bbf62bab8e6a",
+              "leftValue": "={{ $json.sufficient_detail }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3191de4f-40a6-497b-bab8-3a2c1123c47b",
+      "name": "N18: IF: Risk Sufficient Detail?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -20144,
+        16112
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2d73984f-87f2-4eda-8739-4d1f58014334",
+              "name": "output",
+              "value": "=⚠️I need more detail to assess risk properly. \n\nHere's what's missing: {{ $json.missing_info.join(\", \") }}. \n\nCould you share more specifics for the details you are looking for?",
+              "type": "string"
+            },
+            {
+              "id": "d4e4eff2-efdf-47c9-9d81-bd7ab72b4f0c",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7955eca9-7b68-4f16-8646-c0f93fc79c2d",
+      "name": "N19: Ask for More Risk Detail",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -19840,
+        16656
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "df8a2eac-a088-4e0f-8651-8a44f3727f14",
+              "leftValue": "={{ $json.new_risks && $json.new_risks.length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f61d1099-a3b9-4f7a-ac26-8daa4c8dac40",
+      "name": "N20: IF: New Risk Identified?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -19920,
+        16048
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// N16 no longer assigns risk_id itself — scanning for \"the highest existing\n// number\" is exactly the kind of counting an LLM gets wrong, especially when its\n// own search was entity-scoped (e.g. searching for a departing person's name)\n// and never reliably surfaced the full register. N16 now only reports the\n// existing_risk_ids it actually saw (a faithful extraction); this node computes\n// the next sequential id(s) in real code and maps the rest of the fields onto\n// the sheet's column names.\nconst existingIds = Array.isArray($json.existing_risk_ids) ? $json.existing_risk_ids : [];\nlet maxNum = 0;\nfor (const id of existingIds) {\n  const m = /^R(\\d+)$/i.exec((id || '').toString().trim());\n  if (m) {\n    const n = parseInt(m[1], 10);\n    if (n > maxNum) maxNum = n;\n  }\n}\n\nconst newRisks = Array.isArray($json.new_risks) ? $json.new_risks : [];\nconst today = new Date().toISOString().slice(0, 10);\n\nreturn newRisks.map((nr, idx) => {\n  const num = maxNum + idx + 1;\n  const risk_id = 'R' + String(num).padStart(2, '0');\n  return { json: {\n    risk_id,\n    category: nr.category || '',\n    risk_challenge: nr.risk || '',\n    impact: nr.impact || '',\n    mitigation_strategy: nr.mitigation || '',\n    last_updated: today,\n    status: 'Open'\n  } };\n});"
+      },
+      "id": "86dc67fb-c880-49d2-9850-52105ace9b13",
+      "name": "N21: Build New Risk Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -19712,
+        16064
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0001-4001-8001-000000000001",
+              "name": "output",
+              "value": "=⚠️{{ $('N20: IF: New Risk Identified?').item.json.answer }}\n\n⚡Added {{ $('N21: Build New Risk Rows').all().length }} new risk(s) to the register:\n{{ $('N21: Build New Risk Rows').all().map(i => i.json.risk_id + ' - ' +\ni.json.risk_challenge + ' (mitigation: ' + i.json.mitigation_strategy +\n')').join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "66cbdcd8-8016-4e48-9ad7-fcebed79a416",
+              "name": "source",
+              "value": "={{ $('N2: User Input').first().json.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "65e19719-80e0-4b0b-a840-bb2ed6972a6a",
+      "name": "N23: Confirm Risk Added",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -18944,
+        16384
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0002-4002-8002-000000000002",
+              "name": "output",
+              "value": "=⚠️{{ $json.answer }}\n\n{{ (Array.isArray($json.risks) ? $json.risks : []).map(r => '- ' + r.risk\n+ ' [' + r.category + '] Impact: ' + r.impact + '; Mitigation: ' +\nr.mitigation).join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "43833c0c-f2db-4add-b480-bed771fa6abe",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "39cf7112-637f-41ea-a3aa-5e06aac3ff6a",
+      "name": "N24: Return Risk Matrix",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -19792,
+        16416
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Today's date: {{ $now.format('yyyy-MM-dd') }}\n\nUser request: {{ $('N2: User Input').first().json.chatInput }}\n\nCRITICAL STEP FOR STATUS REPORTING:\n1. Cross-examine the \"User request\" against the actual task boards, timelines, and sprint logs retrieved in your context window.\n2. Every count, task ID, and status metric must be pulled verbatim from the files. Do not estimate, combine separate metrics, or round down numbers.\n3. If tasks are flagged with dependencies or blocked indicators, treat those structural conflicts as explicit log requirements in the final report output.",
+        "options": {
+          "systemMessage": "You are the Status Reporter Agent for Mira, operating within a logistics/AI adoption project. Your objective is to retrieve and accurately extract status data from live task boards, sprint logs, and tracking timelines. A downstream deterministic step handles all counting, category bucketing, due-date comparison, and text formatting — your job is retrieval and faithful field extraction only.\n\nTOOL USE IS MANDATORY FOR ANY ACTUAL REPORT: you have access to a tool called R11, which searches the live task board and timeline. Before generating any report output, first perform the VAGUE FILLER CHECK below to decide whether this request has a real target to report on. If it does, you MUST call this tool at least once — never answer from your own assumptions about what the task board probably contains. If the VAGUE FILLER CHECK below determines this is a HARD STOP, do not call the tool at all — that rule overrides this one, not the other way around.\n\nVAGUE FILLER CHECK (perform this before doing anything else below, including STEP 0): First, check whether the request names a specific person, task, sprint, or topic (per the SPECIFIC question rule in STEP 0 below) — if so, proceed to STEP 0 as instructed there. If not, check whether the request is still a genuine, if broad, ASK for status information (e.g., \"give me a status update,\" \"how are we doing,\" \"summarize progress\") — these remain a bare general check; proceed to STEP 0/the extraction pipeline below and populate as normal.\n\nIMPORTANT — look past a \"report for: '...'\" wrapper: some requests are phrased as \"Generate a status report for: '<text>'\" or \"give me an update on: '<text>'\" — an ask-verb wrapped around a quoted or referenced target. Do not let the wrapper verb alone (\"Generate,\" \"give me\") count as a genuine ask. Instead, judge the quoted/referenced target itself: if it names a real person, task, sprint, or topic, treat it as a SPECIFIC question per STEP 0. If it is itself just a vague filler phrase with no real topic (e.g., \"Things are going fine,\" \"all good,\" \"no issues\"), the wrapper does not rescue it — this is still the HARD STOP case below, exactly as if the filler phrase had been sent on its own.\n\nOnly if BOTH of the above are false — the request names nothing specific AND contains no actual ask, just a vague statement or filler phrase with no verb requesting information (e.g., \"things are going fine,\" \"all good,\" \"no issues\") — this is a HARD STOP, not a style preference: do NOT call the tool for report-building purposes, do NOT populate \"tasks\" or \"upcoming_milestones\" with ANY real data. Set \"no_actionable_request\" to true, \"answer\" to something like \"Could you share more details on what you'd like a status update on?\", \"tasks\" and \"upcoming_milestones\" to empty arrays, and \"sufficient_data\" to true regardless — the tracker exists, the user's phrasing just gave nothing to report on.\n\n## STEP 0: DIRECT ANSWER FIRST\nIf the user request names a specific person, task, milestone, or topic AND asks anything about it (status, impact, next steps, what to plan for), this is a SPECIFIC question — you MUST populate \"answer.\" Examples that ALWAYS count as specific: \"Arjun Mehta resigned, share the status of his tasks and what to plan ahead,\" \"what's blocking T024,\" \"is the pilot on track.\" Only leave \"answer\" as an empty string if the request is a bare general check with no named person, task, sprint, or topic at all (e.g., \"give me a status update,\" \"how are we doing,\" \"things are going fine\").\n\nFor a specific question: use the retrieved task board and timeline data to find every record tied to the named person/task/topic (check assignee and owner fields for a person's name), then answer directly in \"answer\" — name the actual task IDs and task names, their current status, and concrete next steps (reassignment, handover, schedule impact).\n\nIf you searched and found genuinely nothing tied to the named person/task/topic, do NOT leave \"answer\" empty — state plainly that no tasks or milestones were found for them in the current data. An empty \"answer\" must only ever mean \"this was a general check with nothing specific to answer,\" never \"I found nothing\" or \"I wasn't sure.\"\n\nTASK/MILESTONE REFERENCE FORMAT: Whenever \"answer\" refers to a specific task, always include its task_id alongside the task name (e.g., \"T024 - Security review of AI infrastructure\"), never the task name alone. The same applies to milestones (include milestone_id) whenever a specific one is referenced in prose. This is a hard formatting rule, not a style preference.\n\nCATEGORY SCOPING: Populate \"requested_categories\" with which of \"done\", \"in_progress\", \"to_do\", \"blocked\", \"at_risk\" the user actually asked about, using these exact lowercase strings. Use [\"all\"] whenever the request is a general status check that doesn't name Done, In Progress, To Do, Blocked, or At Risk specifically — never guess a narrower scope than what was actually asked. The downstream step will only display categories listed here, so this field is what actually enforces scoping — not which task records you include in \"tasks.\"\n\nIMPORTANT — \"blocked\" and \"at_risk\" both require broad retrieval, because you do not decide at-risk status yourself (a downstream step compares due dates in real code): whenever \"blocked\" and/or \"at_risk\" is one of the requested categories, include every non-Done task record in scope in \"tasks\" — not just the ones literally marked \"Blocked\" — each with its real status and due_date. The downstream step will work out from those due_dates which ones are genuinely at risk (including tasks whose deadline has already passed, not only ones approaching it) and will only show categories you listed in \"requested_categories,\" so including extra candidate tasks here never leaks anything into the wrong category — it is what makes accurate at-risk detection possible at all. For \"done\"/\"in_progress\"/\"to_do\" requested individually (with neither \"blocked\" nor \"at_risk\" requested), only include tasks whose literal retrieved status matches, as before.\n\nCOMPLETENESS FOR \"blocked\"/\"at_risk\" WHEN NO SPRINT IS NAMED: if the request doesn't name a specific sprint (report_scope is \"All Sprints\") and asks about blocked/at-risk tasks, your retrieval must cover the entire task board across every sprint, not just whichever sprint's records happen to surface first — call the tool with a broad, generic query (not one narrowed to a specific topic like \"security\" or \"blocked\") so you get full coverage, then include every non-Done record you retrieved as a candidate per the rule above. Missing a genuinely overdue task because your tool query was too narrow is the same failure as missing a genuinely blocked one.\n\nEXCEPTION — a sprint's own milestone is never dropped by this rule: when the report is scoped to a specific sprint (per SPRINT SCOPING below), populate upcoming_milestones with any milestone tied to that sprint per SPRINT-MILESTONE LINKAGE below, even though the user didn't say the word \"milestone.\" A sprint's milestone dependency is part of that sprint's status, not an optional extra category to opt into. This exception is specific to sprint scoping — it does not apply when the request narrows to a single named category unrelated to a sprint (e.g. \"which tasks are blocked\" with no sprint named); there, keep the narrow scoping exactly as instructed above.\n\nSINGLE-CATEGORY ANSWER BREVITY: If the request is scoped to exactly ONE category with nothing else asked (e.g., \"what milestones are coming up,\" \"which tasks are blocked\"), \"answer\" must be a SHORT scope-confirming sentence only (e.g., \"Upcoming milestones in the next 2 weeks.\") — do NOT restate each item's name, ID, or dates in \"answer.\" The full details belong exclusively in \"tasks\"/\"upcoming_milestones\"; repeating them in prose creates a duplicated, redundant report.\n\nSPRINT SCOPING: If the request names a specific sprint (e.g., \"Sprint 2\"), scope the entire \"tasks\" array to only that sprint's tasks. Check each task's own \"sprint\" field value LITERALLY against the requested sprint number before including it. A task record showing \"sprint: Sprint 5\" is NOT a match for a request scoped to Sprint 2, regardless of how relevant, recent, or current that task otherwise looks — thematic or general relevance is never sufficient, only an exact match on the sprint field counts. If genuinely no tasks match the requested sprint, leave \"tasks\" empty and say so plainly in \"answer,\" in your own words.\n\nMANDATORY SCOPE VERIFICATION (perform this before writing report_scope): Re-read the original user request literally. Does it contain an actual sprint number, a named person, or a named task/topic? If NOT, report_scope MUST be \"All Sprints\" — never invent, infer, or default to a specific sprint that was not explicitly named in the request, even if the retrieved context happens to be dominated by tasks from one particular sprint. A sprint number appearing in your retrieved data is not the same as a sprint number appearing in the user's own request — only the latter justifies scoping.\n\nMANDATORY CATEGORY COMPLETENESS CHECK (perform this before finalizing your output): You must attempt to include every matching task record from the full retrieved context in \"tasks\" — not just the first or most prominent one you encountered. Including only one or two records when several are in scope is a failure to comply with CATEGORY SCOPING above, regardless of how the retrieved context was structured.\n\nSTATUS AND DUE-DATE FIELDS — report literally, do not compute: For every task record you include, copy its \"status\" field EXACTLY as retrieved — one of \"Done\", \"In Progress\", \"To Do\", or \"Blocked\" — without reinterpreting, upgrading, or downgrading it. You are NOT responsible for deciding whether a task is \"at risk\" or for comparing its due date against today — a downstream step does that comparison reliably in real code. Your only job for due_date is to normalize whatever format the record uses into YYYY-MM-DD (e.g., a retrieved \"29-09-2026\" becomes \"2026-09-29\") and report it exactly, without judging whether it has passed.\n\n## CORE PRINCIPLES (STRICT COMPLIANCE REQUIRED)\n* HARD NUMBERS SURVIVE: task_ids, statuses, and due dates must match the source records exactly. Never estimate, average, or invent a value.\n* CONFLICTS ARE EXPLICIT: Every task whose status is \"Blocked\" must include a \"reason\" field capturing the exact text specifying the blocker or missing dependency. Do not downplay bottlenecks.\n* NO HALLUCINATED FACTS: If no tasks are present in the context for a requested scope, leave \"tasks\" empty. Do not invent filler tasks or statuses.\n\n## STEP-BY-STEP EXTRACTION PIPELINE:\n1. QUANTITATIVE RETRIEVAL: Scan the retrieved context for records. Only place task board records (source: task_board) in \"tasks.\" Timeline/milestone records (source: timeline) belong exclusively in \"upcoming_milestones\" — never mix a milestone into \"tasks,\" even if its own status field looks like \"Done\" or \"In Progress.\"\n1b. SPRINT-MILESTONE LINKAGE: When the report is scoped to a specific sprint, also scan the retrieved timeline records for the milestone(s) that sprint's tasks actually feed into. A retrieved timeline record is tied to the scoped sprint if either holds: (a) its planned_start_date/planned_end_date window overlaps the sprint's own task due_dates, or (b) its phase_name matches the phase the sprint's tasks belong to (tasks and milestones in the same project phase are linked even without a shared field). Do not require an explicit \"sprint\" field on the milestone record — milestones don't carry one; the phase/date overlap with the sprint's own tasks is the real link. Include every milestone you find this way in \"upcoming_milestones,\" with its real milestone_id and name — never invent one, and never skip a genuinely tied milestone just because it wasn't named in the request.\n2. CONFLICT ISOLATION: For every task whose retrieved status is \"Blocked,\" capture the exact blocker text into that task's \"reason\" field.\n3. FIELD EXTRACTION: Retrieved content is raw text in \"field: value\" format per record. Parse each record and extract task_id, task (name), status, and due_date (normalized to YYYY-MM-DD) for every task in scope; extract milestone_id and milestone (name) for every milestone in scope. Never copy an entire raw record verbatim into an output field.\n\nIMPORTANT — DO NOT CONFUSE TWO DIFFERENT \"id\" VALUES: each retrieved record has its own internal vector-store id (a random UUID, appearing as a top-level \"id\" field alongside \"pageContent\" and \"metadata\") — this is NOT the task_id and must NEVER be used as one. The real task_id (e.g., \"T001\") is a labeled field written INSIDE pageContent itself (e.g., \"task_id: T001\"). Always extract task_id from within pageContent's text, never from the record's own outer \"id\" field.\n\nDEDUPLICATION: Include each task_id and milestone_id only once in your output, even if the same record appears more than once in your retrieved context.\n\n4. GATEKEEPER ROUTING LAW (sufficient_data):\n   - Set to true only if you actually retrieved tracking data via the tool this run (or the request was a HARD STOP per VAGUE FILLER CHECK, which is exempt).\n   - Set to false if the tool returns nothing relevant, or if you have not called it.\n\n## OUTPUT FORMAT — STRICT JSON ONLY\nDo all of the reasoning above silently. Output ONLY a single JSON object — no prose, no markdown, no code fences, no text before or after it. The downstream formatting step depends on this being clean, parseable JSON.\n\nSchema:\n{\n  \"sufficient_data\": boolean,\n  \"no_actionable_request\": boolean,\n  \"report_scope\": string,\n  \"answer\": string,\n  \"requested_categories\": [\"done\" | \"in_progress\" | \"to_do\" | \"blocked\" | \"at_risk\" | \"all\", ...],\n  \"tasks\": [\n    { \"task_id\": string, \"task\": string, \"status\": \"Done\" | \"In Progress\" | \"To Do\" | \"Blocked\", \"due_date\": \"YYYY-MM-DD\", \"reason\": string }\n  ],\n  \"upcoming_milestones\": [\n    { \"milestone_id\": string, \"milestone\": string }\n  ]\n}\n\nNotes:\n- \"reason\" is only meaningful for \"Blocked\" tasks; use an empty string for all others.\n- \"tasks\" and \"upcoming_milestones\" must be [] when there is nothing to report for that scope, not omitted.\n- \"answer\" must be an empty string when STEP 0 doesn't apply (a bare general check).\n- \"requested_categories\" must never be empty — use [\"all\"] for a general check."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -21168,
+        16528
+      ],
+      "id": "3289f6a5-0fe3-4797-b2a7-4c98d41134b1",
+      "name": "N25: Status Reporter Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BGQ8W110W",
+          "mode": "list",
+          "cachedResultName": "errors"
+        },
+        "text": "=Result: {{ $json._parseError }}",
+        "otherOptions": {}
+      },
+      "id": "30f82248-26bc-46da-8e3e-4298d8793c88",
+      "name": "E: Notify Parse Error to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -22384,
+        16832
+      ],
+      "webhookId": "11f24018-27de-45df-ba8f-5ad6d97898f4",
+      "credentials": {
+        "slackApi": {
+          "id": "5Gj9WKoppXnaAXvl",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9c49de4c-3b9d-44b4-92e1-a51bed2bf753",
+      "name": "EC1: Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -22288,
+        17248
+      ]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BGQ8W110W",
+          "mode": "list",
+          "cachedResultName": "errors"
+        },
+        "text": "=🛑 *Workflow error* in *{{ $json.workflow.name }}*\nFailed node: {{ $json.execution.lastNodeExecuted }}\nError: {{ $json.execution.error.message }}\nExecution: {{ $json.execution.url }}",
+        "otherOptions": {}
+      },
+      "id": "d242db1c-9ad3-49b3-8ae9-96ff1c1c637e",
+      "name": "EC2: Slack Error Alert",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [
+        -22064,
+        17248
+      ],
+      "alwaysOutputData": true,
+      "webhookId": "09d59436-0ae2-4ba5-933b-8302bc022bb7",
+      "credentials": {
+        "slackApi": {
+          "id": "5Gj9WKoppXnaAXvl",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User request: {{ $('N2: User Input').first().json.chatInput }}\n\nCRITICAL STEP FOR PROCESSING:\n1. Cross-examine the \"User request\" using your risk_register_search tool — call it at least once before responding.\n2. Look beyond the risk register itself: your tool also covers sprint files, team task boards, and project rosters — use it to identify the specific sprints, components, or responsibilities tied to the entities or people named in the request.\n3. Synthesize this cross-file information to determine the operational risk of the request.\n4. If the tool returns information about the person's specific tasks, you have everything you need to assess the risk — proceed with the risk generation steps defined in your system instructions. If it returns nothing relevant, say so explicitly in missing_info rather than treating that as a reason to invent details.",
+        "options": {
+          "systemMessage": "You are the Risk Assessor Agent for Mira, operating within a logistics/AI adoption project. You have access to a tool called risk_register_search, which searches the live project risk register, sprint timelines, task boards, and team assignments. You receive a live user request concerning project risks or organizational changes.\n\nTOOL USE IS MANDATORY, NOT OPTIONAL: you MUST call risk_register_search at least once for every request before generating any risk assessment — never answer from your own assumptions about what the register probably contains. If the tool returns no relevant results for the named person, system, or event, say so explicitly in missing_info; do not silently skip calling it and fabricate plausible-sounding content instead.\n\n## DATA SCHEMA REFERENCE\nRetrieved content comes from three sources, each with a fixed set of fields. Use these field names to correctly interpret what you retrieve:\n\nRisk Register (source: risk_register): risk_id, category, risk_challenge, impact, mitigation_strategy, last_updated, status\n\nTask Board (source: task_board): task_id, task_name, status, assignee, priority, sprint, start_date, due_date, labels, description\n  — \"assignee\" is the person responsible for that task. A person's name appearing as an assignee value is direct evidence of their project footprint.\n\nTimeline (source: timeline): milestone_id, phase_number, phase_name, milestone_name, planned_start_date, planned_end_date, status, owner, dependency_task_ids\n  — \"owner\" is the person responsible for that milestone.\n\nTASK/RISK REFERENCE FORMAT: Whenever \"answer\" refers to a specific task, always include its task_id alongside the task name (e.g., \"T024 - Security review of AI infrastructure\"), never the task name alone. The same applies to risks (include risk_id) and milestones (include milestone_id) whenever a specific one is referenced in prose. This is a hard formatting rule, not a style preference — a user reading the answer must be able to identify the exact record being discussed.\n\n## STEP 0: INTENT CLASSIFICATION (do this FIRST, before any matching or creation logic)\nDetermine whether the user request is:\n- REPORT: describing a new event, change, or problem not previously logged (e.g., \"X is leaving,\" \"Y system failed\")\n- QUESTION: asking about impact, status, sprints, or details of a person, system, or event that may already be tracked, OR asking for a broad/summary view of existing risks (e.g., \"which sprints does X's departure affect,\" \"what are the top 3 risks,\" \"give me a risk assessment for the project\")\n- BOTH: reports a new event AND asks a specific question about it in the same message\n\nBOTH is easy to misclassify as QUESTION-only when the sentence is phrased as a question — check the CONTENT, not just the grammar. A message reporting a person leaving, resigning, or stepping back — even when phrased as \"which sprints does this affect\" or \"what's the impact\" — is BOTH: it reports a new event (the departure) AND asks a specific question about it. Concretely: \"Priya Nair is leaving the organization. Which sprints does this affect?\" is BOTH, not QUESTION — the departure itself has never been logged, so it still requires a new_risks entry per Step 3, in addition to directly answering which sprints are affected in \"answer.\"\n\nIf REPORT or BOTH: proceed to Steps 1-4 below.\nIf QUESTION only: skip risk creation entirely. Use risk_register_search to find the relevant existing row(s) and retrieved task/sprint data, then populate \"answer\" with a direct, specific response. Do not add anything to new_risks — a question about an existing situation is never grounds to create a duplicate risk, even if the matched row's category feels generic.\n\n## CORE PRINCIPLES (STRICT COMPLIANCE REQUIRED)\n* NO HALLUCINATED FACTS: Do not invent project tasks, budgets, or names. If a specific detail is missing from all retrieved context, state it strictly as an open question or an explicit assumption within the mitigation text. Do not use it as an excuse to skip risk generation if a real-world event (e.g., a team member leaving) has been declared in the user request.\n* CONFLICTS & RISKS ARE EXPLICIT: If an event creates a resource bottleneck or transition gap, map it out clearly. Do not assume other team members can absorb the workload unless explicitly stated in the retrieved context.\n* TRACEABILITY BY DEFAULT: Every risk identified must map directly back to a specific person, sprint, or technical component found within the input data or retrieved context.\n\n## STEP-BY-STEP RISK ASSESSMENT PIPELINE (Steps 1-4, run only after Step 0 above):\n1. MULTI-FILE CONTEXT RECONSTRUCTION: If the request names a specific entity or person (e.g., Priya Nair), use risk_register_search to scan sprint schedules, task logs, and roles to identify exactly which components or sprints they are working on. Verify this LITERALLY against each retrieved record's own assignee/owner field — do not attribute a sprint or component to someone based on thematic relevance or general plausibility if their name does not actually appear in that record's stored data. If the request names no specific entity — a broad or project-wide ask (e.g., \"assess the project's risks,\" \"top 3 risks,\" \"what are the risks for ABCDE Ltd\") — skip entity reconstruction and instead retrieve and work directly from the full set of relevant risk register rows via the tool; every risk referenced must still be an actual row returned by the tool, never invented to fill out a category. If the user requests a specific number of risks (e.g., \"top 3\"), your \"risks\" array must contain EXACTLY that many entries — no more, no fewer. Rank all candidate risks by severity/impact and include ONLY the requested count, even if more relevant risks exist in the register. Do not return every retrieved risk when a specific number was requested.\n\nIMPORTANT DISTINCTION: A broad/project-wide ask is a genuine QUESTION asking for existing tracked risks (it asks to see, list, or summarize risks that are already there). It is NOT the same as a vague, generic STATEMENT with no identifiable project or scope attached at all (e.g., \"new project starting soon,\" \"we're launching something,\" \"starting a new initiative\"). The second kind names no actual project for the register to be relevant to — it doesn't ask about existing risks, it vaguely gestures at something hypothetical. That must be routed through GATEKEEPER ROUTING LAW below and set sufficient_detail to false — it is never eligible for the broad-request path above. If the request doesn't clearly ask \"what are the risks/give me an assessment\" for an identifiable project, treat it as insufficient rather than broad.\n\nSPRINT/COMPONENT-SCOPED REQUESTS: If the request names a specific sprint (e.g., \"Sprint 5\") or technical component, but no specific person, first identify the real tasks and assignees belonging to that sprint/component via the tool. Then apply the SAME literal-matching discipline as named-entity requests: only include a register risk if its own stored text names a person, system, or theme actually present in that sprint's real tasks. Do not default to the most severe-sounding or most recently discussed risk in the register — a sprint-scoped request needs risks literally grounded in THAT sprint's actual data, not a generic substitution. A specific sprint number is itself sufficient scope for a broad request — do not treat a sprint-scoped question as vague or insufficient.\n\nREQUESTED COUNT EXTRACTION: This is a literal text-extraction task, not a judgment call. If the user's request contains a number near a word like \"top\" (e.g., \"top 3,\" \"top-5\"), or explicitly asks for \"N risks,\" extract that exact number as an integer and place it in \"requested_count.\" Do this by directly reading the number already written in the request — do not reason about it, estimate it, or leave it null when a number is clearly present in the text.\n\nWhen requested_count is set, \"answer\" must be a SHORT scope-confirming sentence only (e.g., \"Here are the top 3 risks, ranked by severity.\") — do NOT enumerate or describe the individual risks in \"answer\" when a specific count was requested. The full risk details belong exclusively in the \"risks\" array below; repeating them in prose risks the two falling out of sync.\n\nRISK LIST HEADING: Always populate \"risk_list_heading\" with a short, natural sentence introducing the risks array below, phrased to match what was actually asked — not a generic template. Examples: for \"top 3 risks\" → \"Here are the top 3 risks, ranked by severity\"; for risks about a specific sprint → \"Here are the risks affecting Sprint 4\"; for risks tied to a specific system or vendor → \"Here are the risks related to [that system/vendor]\"; for a general \"assess the project's risks\" request with no specific angle → \"Here are the relevant risks for your query.\" In every case, end the sentence with \"(all already tracked in the register)\" if every risk shown is an existing match, or omit that qualifier if any are newly identified.\n\n2. DEDUCTIVE RISK MATCHING: Once you have identified their project footprint (or the relevant register rows, for a broad request), search the existing rows of the risk register (via the tool) to see if this EXACT operational threat is already tracked. This check applies identically whether the user is reporting a new event or asking a question about one already logged — a question about an already-tracked entity should match and route to \"risks,\" never \"new_risks.\"\n   - A row is a match ONLY if that row's OWN existing risk_challenge text already names the same specific person, system, or event you are evaluating. Check literally: does the register row's stored text already contain this name or entity? If not, it is not a match, no matter how similar the category or general theme is. Thematic similarity (e.g., both being \"talent\" or \"continuity\" related) is never sufficient on its own.\n   - If a matching row already exists under this test, place it in \"risks\", carrying over its real risk_id and its own existing text essentially unchanged. You must also fill in matched_entity with the exact name or term you found already present in that row's own stored text — if you cannot point to specific text already containing it, it is not a match.\n   - Concretely: neither \"Talent & Skills Gap\" nor \"Project Continuity\" already naming Priya Nair means departures like hers are NEW risks under this test, every time, regardless of how those categories read.\n3. CONCRETE NEW RISK CREATION: If the event or its specific operational impact on those sprints is NOT represented in the risk register, you MUST generate a new entry in \"new_risks\". For team departures, project the structural risks to the specific sprints they handle based on the loss of continuity, handovers, and velocity slowdowns. Do not attach a risk_id to entries in \"new_risks\" yourself — see RISK REGISTER COVERAGE below for what you do instead. Never generate a new_risks entry for a broad/project-wide request (Step 1's second case) — that path only ever returns existing tracked risks.\n3.5. RISK REGISTER COVERAGE FOR ID SAFETY: You do NOT assign risk_id yourself — a downstream step computes the next sequential id in real code, because scanning for \"the highest existing number\" is exactly the kind of counting a model gets wrong when its own search happened to be entity-scoped (e.g. searching for a departing person's name won't reliably surface the full risk register). Your only job here is coverage: whenever your output will include any \"new_risks\" entries, you MUST also call risk_register_search at least once with a broad, generic query such as \"risk register\" or \"all tracked risks\" — separate from any entity-specific search you already did — so you actually see the full existing register, not just rows that happen to mention the named person or event. Then populate \"existing_risk_ids\" with every risk_id you saw in ANY risk_register row retrieved this run (from either search), deduplicated, exactly as written (e.g. [\"R01\",\"R02\",...]). This is a faithful extraction of what you retrieved, not a computation — do not sort, dedupe by number, or try to find the max yourself; just list every id string you saw. If you genuinely retrieved zero risk_register rows even after the broad search, leave \"existing_risk_ids\" as an empty array and say so — do not guess or assume the register is actually empty.\n4. GATEKEEPER ROUTING LAW (sufficient_detail):\n   - Set \"sufficient_detail\" to true if the request names a specific, documented project (e.g., \"the AI Adoption Project at ABCDE Ltd\"), a specific organizational change or operational problem, a specific sprint, OR asks broadly for existing risks (a summary, top-N, or full assessment) — in any of these cases, proceed using the tool's actual returned data.\n   - Set \"sufficient_detail\" to false if the request is generic with no identifiable project, scope, sprint, or problem to work from (e.g., \"new project starting soon,\" \"we're launching something\") — a vague one-liner does not become sufficient just because the tool returns unrelated register content when called; the request itself must name or clearly imply the specific project or problem. List the exact items needed (e.g., project name, scope, or the nature of the concern) under \"missing_info\".\n   - Also set \"sufficient_detail\" to false if the user request is completely incomprehensible, or if the tool returns absolutely zero records regarding the sprints, tasks, roles, or risks related to the request.\n\nSELF-VERIFICATION (there is no downstream safety net — this is the only check that will run): Before finalizing, re-read your own \"risks\" and \"new_risks\" arrays against the actual retrieved register text one more time. Confirm every risk_id in \"risks\" really came from a retrieved row (never invented), and confirm no entry in \"new_risks\" duplicates a risk_challenge already present in the retrieved register under a different phrasing (re-run the DEDUCTIVE RISK MATCHING test literally, not from memory of your own earlier reasoning in this response).\n\nCONSISTENCY CHECK (perform this before finalizing your output): compare your own \"answer\" field against the \"risks\" and \"new_risks\" arrays you are about to output. If \"answer\" claims no risks were found or nothing is tracked, both arrays must genuinely be empty. If either array contains real entries, \"answer\" must not claim nothing was found — rewrite \"answer\" to match what the arrays actually show before returning your response.\n\n## OUTPUT GENERATION LAW\nOutput an unquoted, strict JSON object matching this schema exactly. The keys below are fixed and must be used exactly as written — \"risk\" and \"mitigation\", not the register's own column names (risk_challenge, mitigation_strategy), even though those are the source columns you're reading from. Entries in \"new_risks\" do NOT include a risk_id field at all — a downstream step assigns it deterministically from \"existing_risk_ids\" (see RISK REGISTER COVERAGE above).\n{\n  \"intent\": \"report\"|\"question\"|\"both\",\n  \"answer\": \"string — a direct, specific response to what the user actually asked (e.g., naming the exact sprints affected, or a summary for a broad/top-N request), using retrieved task/timeline/register data. Always populate this, even when risks/new_risks is empty. Always include task_id/risk_id/milestone_id when referencing a specific record (see TASK/RISK REFERENCE FORMAT above).\",\n  \"requested_count\": \"number or null — the specific number of risks the user asked for (e.g., 3 for 'top 3'), or null if no specific count was requested.\",\n  \"risk_list_heading\": \"string — a short sentence introducing the risks list, phrased to match what was actually asked (see RISK LIST HEADING instruction above).\",\n  \"sufficient_detail\": boolean,\n  \"missing_info\": [\"string\"],\n  \"existing_risk_ids\": [\"string — every risk_id seen in any retrieved risk_register row this run, deduplicated, see RISK REGISTER COVERAGE above\"],\n  \"risks\": [\n    {\n      \"risk_id\": \"string\",\n      \"category\": \"string\",\n      \"risk\": \"string\",\n      \"impact\": \"string\",\n      \"mitigation\": \"string\",\n      \"matched_entity\": \"string — the specific name, system, or event you found already present in this row's own stored text, justifying the match; for a broad/project-wide request with no single named entity, use the request's own topic (e.g., 'project-wide assessment') here instead\"\n    }\n  ],\n  \"new_risks\": [\n    {\n      \"category\": \"string\",\n      \"risk\": \"string\",\n      \"impact\": \"string\",\n      \"mitigation\": \"string\"\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -21520,
+        16064
+      ],
+      "id": "1a01f980-8d5c-4fc4-b010-9ad6e23f57a5",
+      "name": "N16: Risk Assessor Agent"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -23024,
+        15840
+      ],
+      "id": "96a9faab-cd17-4409-b733-3d66ef72dac5",
+      "name": "M1: Daily Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Safely parses the Orchestrator's routing JSON and flags malformed output\nconst raw = $json.output ?? $json.text ?? '';\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nlet parsed, valid = true, error = null;\ntry { parsed = JSON.parse(cleaned); } catch (e) { valid = false; error = e.message; parsed = {}; }\nreturn [{ json: {\n  chatInput: $('N2: User Input').first().json.chatInput,\n  sessionId: $('N2: User Input').first().json.sessionId,\n  source: $('N2: User Input').first().json.source,\n  ...parsed,\n  _valid: valid,\n  _parseError: error\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -22608,
+        16384
+      ],
+      "id": "70b13f90-06e2-4cd0-844f-43dcb61504d2",
+      "name": "N6a: JS-Parse & Validate JSON"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -22912,
+        16736
+      ],
+      "id": "1227757b-d6e1-4d71-9b1a-1ad72f3d3a7e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -22784,
+        16080
+      ],
+      "id": "919a4b63-f407-464c-9c8c-62fcc1ce1466",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -21408,
+        15888
+      ],
+      "id": "ffd26b36-c7ce-4593-80ec-8ce4dd1d875e",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "temperature": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -21536,
+        16256
+      ],
+      "id": "307460f0-b3af-406d-9646-c7156b406f43",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "maxTokens": 8192,
+          "temperature": 0,
+          "maxRetries": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -21200,
+        16704
+      ],
+      "id": "b73e4121-3344-410c-9c29-33463fe74522",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('N2: User Input').item.json.chatInput }}",
+        "options": {
+          "systemMessage": "You are the Classifier Agent for Mira, a project intelligence assistant. Classify the user's request into exactly one category based on intent, not keywords alone:\n- \"plan\": the user wants a project plan generated\n- \"risk\": the user wants a risk assessment or wants to know existing risks\n- \"status\": the user wants a status report, task summary, or milestone check\n- \"stakeholder_update\": the user wants a written update/email/summary communication for stakeholders — distinct from \"status,\" which wants structured task/milestone data, not prose. Trigger words: \"stakeholder update,\" \"progress email,\" \"write an update,\" \"summary for leadership/stakeholders.\"\n- \"unclear\": the request does not clearly map to any of the above, or lacks enough detail to route\n\nIf the request appears to be answering a previous clarifying question (for example, it only supplies scope, timeline, team size, or similar specifics with no other context), use the conversation history to classify it the same way as the original request it's completing, not as a fresh unclear message.\n\nDISAMBIGUATION: A request about a person's departure, leaving, or stepping back — even if it mentions \"sprints\" or task-related words — is a RISK question about organizational impact, not a STATUS question about task progress. Status is about the current state of existing tasks; Risk covers what happens if a person or resource is lost. When in doubt between the two for a personnel-change scenario, choose \"risk.\"\n\nA request for \"risks\" or \"top N risks\" naming only \"this project\" or \"the project\" (no explicit project name) is still clearly a RISK request — route it to \"risk\" regardless of whether a specific project name was given. Whether enough detail exists to actually answer it is the Risk Assessor's own job to determine afterward, not something you need to pre-filter here.\n\nA request asking for a report, summary, or update phrased as something to SEND or SHARE with others (an email, a written update, a message \"for the team\" or \"for stakeholders\") is \"stakeholder_update,\" even if it also references sprint or task-related content — the deciding factor is whether the user wants structured data back (status) or a written communication they can send as-is (stakeholder_update).\n\nThis disambiguation guidance is about WHICH category a request belongs to, not whether it has enough DETAIL to be answered. A request that is clearly plan-shaped, risk-shaped, status-shaped, or stakeholder-update-shaped — even if vague or underspecified — should still route to that category. Only use \"unclear\" when the request's INTENT itself cannot be determined (i.e., you cannot tell which of the four categories it belongs to at all) — never use \"unclear\" as a substitute for \"insufficiently detailed.\" Each specialist agent has its own logic for flagging vague requests within its category; that is not your job.\n\nOutput strict JSON: { \"routes\": [\"plan\"|\"risk\"|\"status\"|\"stakeholder_update\", ...], \"reason\": string }"
+        }
+      },
+      "id": "c7ca7201-4b4d-4fb2-aa61-e4d9cd9c32dd",
+      "name": "N6: Classifier Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -22880,
+        16560
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5d817adc-c5af-48db-8b95-f64401ddfeab",
+              "name": "output",
+              "value": "=🔍I'm not sure what you're looking for yet. Here's how I read the request: {{ $json.reason }}. I can put together a project plan, a risk assessment, or a status report for the ABCDE Ltd. AI Adoption Project: which one would you like?",
+              "type": "string"
+            },
+            {
+              "id": "fdb4ba58-8d7f-483f-abfd-fb2d087c0028",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -21120,
+        17696
+      ],
+      "id": "f126e908-c467-489a-a0c4-191bd7052850",
+      "name": "N10: Ask for Clarification (unclear branch)"
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": "={{ 768 }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -21088,
+        16304
+      ],
+      "id": "b778b759-344d-450e-8396-01f1c9faffd4",
+      "name": "R10: Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": "={{ 768 }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -21104,
+        17424
+      ],
+      "id": "d4bf7bd2-629c-4a44-927e-22339ed65a89",
+      "name": "R11: Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": "={{ 768 }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -21056,
+        15952
+      ],
+      "id": "4ba52827-52fc-4781-9d28-08643328f274",
+      "name": "R9: Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve Documents from Pinecone to set context for Planning Agent.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "mira-pineconeindex",
+          "mode": "list",
+          "cachedResultName": "mira-pineconeindex"
+        },
+        "topK": 12,
+        "options": {
+          "pineconeNamespace": "NS_miraprojectplanningfiles",
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ { \"$in\": [\"drive_doc\", \"timeline\", \"task_board\"] } }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -21008,
+        15840
+      ],
+      "id": "77cb9cce-c753-4853-b970-fbc00d207662",
+      "name": "R9: Pinecone Get (Planner Context)",
+      "credentials": {
+        "pineconeApi": {
+          "id": "TGHtd72Zc4t0d7a5",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve Documents from Pinecone to set context for Status Reporter Agent",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "mira-pineconeindex",
+          "mode": "list",
+          "cachedResultName": "mira-pineconeindex"
+        },
+        "topK": 50,
+        "options": {
+          "pineconeNamespace": "NS_miraprojectplanningfiles",
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ { \"$in\": ['timeline', 'task_board'] } }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -21168,
+        17248
+      ],
+      "id": "102f216b-82fa-4dcb-90d2-4fb80d8cf83b",
+      "name": "R11: Pinecone Get (Status Context)",
+      "credentials": {
+        "pineconeApi": {
+          "id": "TGHtd72Zc4t0d7a5",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve Documents from Pinecone to set context for Milestone Tracker",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "mira-pineconeindex",
+          "mode": "list",
+          "cachedResultName": "mira-pineconeindex"
+        },
+        "topK": 50,
+        "options": {
+          "pineconeNamespace": "NS_miraprojectplanningfiles",
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ { \"$in\": ['timeline', 'task_board'] } }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -22480,
+        15968
+      ],
+      "id": "29cad037-d8be-441b-8c39-b29793dc2113",
+      "name": "R12: Pinecone Get (Milestones Context)",
+      "credentials": {
+        "pineconeApi": {
+          "id": "TGHtd72Zc4t0d7a5",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dimensions": "={{ 768 }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -22480,
+        16096
+      ],
+      "id": "4be924c8-45bd-46a4-842d-38be853bdaa9",
+      "name": "R12: Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=CRITICAL STEP FOR TRACKING EXTRACTION:\n1. Retrieve every milestone record from the timeline, and every referenced dependency task from the task board.\n2. Every milestone ID, name, date string, status value, and dependency task ID/status/due date must be extracted verbatim — never rounded, inferred, or invented.\n3. You do not decide which milestones are at risk or compare any date to today — a downstream step does that from the fields you extract.",
+        "options": {
+          "systemMessage": "You are the Milestone Tracker Agent for Mira, operating on an automated schedule within a logistics/AI adoption project. Your objective is to retrieve and faithfully extract milestone and dependency-task data from the live timeline and task board. A downstream step handles all date comparison, at-risk determination, and counting in real code — comparing a planned end date against today, and a 7-day window, is exactly the kind of arithmetic that goes wrong when a model does it in free text (it has previously called a milestone over a month away \"within 7 days\"). Your job is retrieval and faithful field extraction only.\n\nTOOL USE IS MANDATORY, NOT OPTIONAL: you have a retrieval tool that searches the live timeline and task board. This run has no natural user question to react to — it is an automated daily check — so there is nothing else that will prompt you to search unless you do it on your own initiative. You MUST call the tool at least once, before producing any output, every single time this runs, with a broad query that returns the full set of milestone and task-board records (not a narrow or empty query). Returning \"milestones\": [] without having called the tool is always wrong — an automated check with genuinely zero tracked milestones would be a serious anomaly, not the normal case, so treat an empty result as a sign you need to broaden your query and search again before finalizing, not as an acceptable default.\n\n## CORE PRINCIPLES (STRICT COMPLIANCE REQUIRED)\n* HARD NUMBERS SURVIVE: Dates (YYYY-MM-DD format), milestone IDs, task IDs, and status values must be copied exactly as retrieved — never softened, approximated, or reinterpreted.\n* NO HALLUCINATED FACTS: Base all output exclusively on existing milestone records and actual task board lines found in the context window. Never invent a milestone, a dependency task, or a status/date value that isn't actually present in what you retrieved.\n* YOU DO NOT DECIDE RISK: Do not judge whether a milestone is \"at risk,\" \"overdue,\" or \"on track,\" and do not compare any date to today's date. That determination happens entirely in a downstream step from the fields you report below.\n\n## STEP-BY-STEP EXTRACTION PIPELINE:\n1. Retrieve every milestone record from the timeline (source: timeline). For each one, extract milestone_id, milestone_name, planned_start_date, planned_end_date, and status (literal field value, e.g. \"Not Started\", \"In Progress\", \"Done\").\n2. For each milestone's dependency_task_ids, look up each referenced task_id on the task board (source: task_board) and extract its literal status and due_date (normalized to YYYY-MM-DD).\n3. If a dependency task_id cannot be found anywhere on the task board, still include it in \"dependency_tasks\" with status set to \"Not tracked\" and due_date as an empty string — do not silently drop it, and do not invent a status for it. A missing/untracked dependency is itself meaningful information for the downstream risk check.\n4. Include every milestone you retrieved, not just ones you think look risky — the downstream step decides that from the fields you provide, and a milestone left out here is a milestone the downstream step can never evaluate.\n\n## OUTPUT FORMAT — STRICT JSON ONLY\nOutput ONLY a single JSON object — no prose, no markdown, no code fences, no text before or after it.\n\nSchema:\n{\n  \"milestones\": [\n    {\n      \"milestone_id\": \"string\",\n      \"milestone_name\": \"string\",\n      \"planned_start_date\": \"YYYY-MM-DD\",\n      \"planned_end_date\": \"YYYY-MM-DD\",\n      \"status\": \"string\",\n      \"dependency_tasks\": [\n        { \"task_id\": \"string\", \"status\": \"string\", \"due_date\": \"YYYY-MM-DD or empty string\" }\n      ]\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -22736,
+        15840
+      ],
+      "id": "3f253c1d-a514-4ef1-96b7-fcbcfa1a8f15",
+      "name": "M2: Milestone Tracker Agent",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// M3: Parse Milestone JSON + deterministic risk evaluation\n// M2 now only extracts milestone + dependency-task data faithfully (no date\n// judgment at all); this node does every date comparison and the at-risk /\n// on-track determination in real code, the same way N26 does for the status\n// report — comparing a planned end date to today, or checking a 7-day window,\n// is exactly the kind of arithmetic that previously made M2 call a milestone\n// over a month away \"within 7 days,\" and miss that a dependency task was\n// already overdue.\n\nconst raw = $json.output ?? $json.text ?? '';\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nlet parsed, valid = true, error = null;\ntry { parsed = JSON.parse(cleaned); } catch (e) { valid = false; error = e.message; parsed = {}; }\n\nif (!valid) {\n  return [{ json: { ...parsed, at_risk: [], on_track_count: 0, summary: '', _valid: valid, _parseError: error } }];\n}\n\nconst todayStr = (typeof $now !== 'undefined' ? $now.toFormat('yyyy-MM-dd') : new Date().toISOString().slice(0, 10));\nconst todayDate = new Date(`${todayStr}T00:00:00Z`);\nconst DAY_MS = 24 * 60 * 60 * 1000;\n\nfunction isDone(status) {\n  const s = (status || '').trim().toLowerCase();\n  return s === 'done' || s === 'completed';\n}\nfunction parseDate(d) {\n  if (!d || !/^\\d{4}-\\d{2}-\\d{2}$/.test(d.trim())) return null;\n  return new Date(`${d.trim()}T00:00:00Z`);\n}\n\nconst milestonesIn = Array.isArray(parsed.milestones) ? parsed.milestones : [];\nconst atRisk = [];\n\nfor (const m of milestonesIn) {\n  if (!m || !m.milestone_id) continue;\n  if (isDone(m.status)) continue; // a completed milestone is never at risk\n\n  const endDate = parseDate(m.planned_end_date);\n  const deps = Array.isArray(m.dependency_tasks) ? m.dependency_tasks : [];\n  const incompleteDeps = deps.filter((t) => t && !isDone(t.status));\n  const overdueDeps = incompleteDeps.filter((t) => {\n    const dd = parseDate(t.due_date);\n    return dd && dd < todayDate;\n  });\n\n  const overdueMilestone = !!(endDate && endDate <= todayDate);\n  const daysLeft = endDate ? Math.round((endDate - todayDate) / DAY_MS) : null;\n  const impending = !overdueMilestone && daysLeft !== null && daysLeft >= 0 && daysLeft <= 7 && incompleteDeps.length > 0;\n\n  const reasons = [];\n  if (overdueMilestone) {\n    reasons.push(`Overdue: the planned end date (${m.planned_end_date}) has already passed and status is '${m.status}'.`);\n  }\n  if (overdueDeps.length) {\n    reasons.push(`Dependency task(s) already past due: ${overdueDeps.map((t) => `${t.task_id || '?'} (due ${t.due_date}, status '${t.status}')`).join(', ')}.`);\n  }\n  if (impending) {\n    const stillIncomplete = incompleteDeps.filter((t) => !overdueDeps.includes(t));\n    if (stillIncomplete.length) {\n      reasons.push(`Impending threat: the planned end date is ${daysLeft} day(s) away, and dependency task(s) are not confirmed done: ${stillIncomplete.map((t) => `${t.task_id || '?'} (${t.status || 'status unknown'})`).join(', ')}.`);\n    }\n  }\n\n  if (reasons.length === 0) continue;\n\n  const actionTargets = incompleteDeps.length\n    ? incompleteDeps.map((t) => t.task_id || '?').join(', ')\n    : null;\n  const suggestedAction = actionTargets\n    ? `Expedite completion of ${actionTargets}.`\n    : 'Confirm actual completion and update the milestone status.';\n\n  atRisk.push({\n    milestone_id: m.milestone_id,\n    milestone_name: m.milestone_name,\n    planned_end_date: m.planned_end_date,\n    status: m.status,\n    reason: reasons.join(' '),\n    suggested_action: suggestedAction,\n  });\n}\n\nconst onTrackCount = milestonesIn.length - atRisk.length;\nconst summary = atRisk.length === 0\n  ? 'All milestones on track.'\n  : `${atRisk.length} milestone(s) need attention.`;\n\nreturn [{ json: { ...parsed, at_risk: atRisk, on_track_count: onTrackCount, summary, _valid: valid, _parseError: error } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -22416,
+        15792
+      ],
+      "id": "7952ab9b-e8d9-4c15-9f64-8570ca9b98a8",
+      "name": "M3: Parse Milestone JSON"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "211d789f-38ab-4d36-ad5f-b2de2eadf4ea",
+              "name": "output",
+              "value": "=📅 Daily Milestone Check: {{ $json.at_risk.length }} at risk, {{ $json.on_track_count }} on track\n{{ $json.at_risk.map(m => '⚠️ ' + m.milestone_id + ' - ' + m.milestone_name + ' (planned ' + m.planned_end_date + ', status: ' + m.status + '): ' + m.reason + ' → ' + m.suggested_action).join('\\n') || 'All milestones on track.' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -22208,
+        15792
+      ],
+      "id": "8f20f784-7686-46ba-9ffd-0c3e14164d95",
+      "name": "M4: Post Milestone Alert"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BUR659ANA",
+          "mode": "list",
+          "cachedResultName": "mira-updates"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -22000,
+        15792
+      ],
+      "id": "d88df06b-89b5-47dd-9b03-7a0240d9696f",
+      "name": "M4S: Post Milestone Alert to Slack",
+      "webhookId": "851224be-385f-4d30-a828-cfb828007dce",
+      "credentials": {
+        "slackApi": {
+          "id": "5Gj9WKoppXnaAXvl",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Searches the live project risk register, task board, timeline, and project \ndescription for information relevant to a risk assessment. Use this to find \nexisting risks matching a described event, and to look up a named person's, system's, or task's project footprint (which sprints or milestones they're tied to). Always call this before assessing any risk-related request.",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "mira-pineconeindex",
+          "mode": "list",
+          "cachedResultName": "mira-pineconeindex"
+        },
+        "topK": 50,
+        "options": {
+          "pineconeNamespace": "NS_miraprojectplanningfiles",
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "source",
+                "value": "={{ {\"$in\": ['timeline', 'task_board', 'risk_register'] } }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        -21232,
+        16192
+      ],
+      "id": "cafc213d-f592-40a6-95d3-89586ec2fe58",
+      "name": "risk_register_search",
+      "credentials": {
+        "pineconeApi": {
+          "id": "TGHtd72Zc4t0d7a5",
+          "name": "Pinecone account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1rrQvAQW5MNUSf2h0ATjFW5dWuPEu8Qo7AdrLGtjmTHw",
+          "mode": "list",
+          "cachedResultName": "Mira Risk Register",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rrQvAQW5MNUSf2h0ATjFW5dWuPEu8Qo7AdrLGtjmTHw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 755744898,
+          "mode": "list",
+          "cachedResultName": "project_risks",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rrQvAQW5MNUSf2h0ATjFW5dWuPEu8Qo7AdrLGtjmTHw/edit#gid=755744898"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "risk_id": "={{ $json.risk_id }}",
+            "category": "={{ $json.category }}",
+            "risk_challenge": "={{ $json.risk_challenge }}",
+            "impact": "={{ $json.impact }}",
+            "mitigation_strategy": "={{ $json.mitigation_strategy }}",
+            "last_updated": "={{ $json.last_updated }}",
+            "status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "risk_id",
+              "displayName": "risk_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "risk_challenge",
+              "displayName": "risk_challenge",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "impact",
+              "displayName": "impact",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mitigation_strategy",
+              "displayName": "mitigation_strategy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_updated",
+              "displayName": "last_updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4c4ae86a-2231-42e2-9bcf-e7524839c10c",
+      "name": "N22: Append New Risks to Risk Register",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -19152,
+        16080
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3LwEYfxfknLBvggm",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Turns one multi-intent classification into one item per intent,\n// so everything downstream (N9's Switch, each specialist agent)\n// keeps working exactly as it already does, unchanged\nreturn $json.routes.map(r => ({ json: { ...$json, route: r } }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -22448,
+        16368
+      ],
+      "id": "028df7b9-f78d-489f-b608-1293824d0ec3",
+      "name": "N7: Multi-intent message"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BUR659ANA",
+          "mode": "list",
+          "cachedResultName": "mira-updates"
+        },
+        "message": "=Approve or Deny to Append the following New Risks to Risk Register:\n⚡{{ $('N21: Build New Risk Rows').all().length }} New risks found:\n{{ $('N21: Build New Risk Rows').all().map(i => i.json.risk_challenge + ' (mitigation: ' + i.json.mitigation_strategy + ')').join('\\n') }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double",
+            "disapproveLabel": "Deny"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -19552,
+        16064
+      ],
+      "id": "6f98d5dc-0318-44e5-979a-ed60fc7789b8",
+      "name": "N21b: New Risk Approval",
+      "webhookId": "2aec0498-25ca-49f4-b7db-3f9ec5712ff5",
+      "executeOnce": false,
+      "credentials": {
+        "slackApi": {
+          "id": "5Gj9WKoppXnaAXvl",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c3e32f5e-185f-46ab-9675-e268702b4b62",
+              "name": "chatInput",
+              "value": "={{ $json.chatInput || $json.body.input }}",
+              "type": "string"
+            },
+            {
+              "id": "6591b82d-28ab-4be4-aec3-b19cda8eebe3",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId || $json.body.sessionId || 'langsmith-' + $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ef22954b-7905-4737-b50d-41d469e6d00f",
+              "name": "source",
+              "value": "={{ $json.body !== undefined ? 'webhook' : 'chat' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -23056,
+        16560
+      ],
+      "id": "715607f4-2854-4fc5-a49c-b631475558c3",
+      "name": "N2: User Input"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N21b's approval collapses to one item (one Approve/Deny decision\n// covering all new risks). Re-expand back to N21's full list here,\n// so N22 gets one item per risk to append, not just one.\nreturn $('N21: Build New Risk Rows').all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -19360,
+        16080
+      ],
+      "id": "b49fb367-fe57-48c3-a9ac-7af879912cc5",
+      "name": "N21c: Expand Approved Risks"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -18208,
+        17424
+      ],
+      "id": "965bb29c-9f73-4a1a-90fb-02829627ff4b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c31d9466-b8cd-4b40-91f3-e7a753b1e68a",
+              "leftValue": "={{ $('N2: User Input').first().json.source }}",
+              "rightValue": "webhook",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -18480,
+        17328
+      ],
+      "id": "8cbda494-9330-473c-b3f3-47f8d167975f",
+      "name": "Final Gate"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BUR659ANA",
+          "mode": "list",
+          "cachedResultName": "mira-updates"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -18208,
+        17200
+      ],
+      "id": "967ac519-c1f6-4365-8375-1bdfccf2582c",
+      "name": "Post Message to Slack",
+      "webhookId": "362ef8df-d176-43f9-81a2-008dbb3bbb67",
+      "credentials": {
+        "slackApi": {
+          "id": "5Gj9WKoppXnaAXvl",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Classify, Validate and Route to respctive Agents",
+        "height": 672,
+        "width": 1552,
+        "color": 5
+      },
+      "id": "a50f3e17-20a0-47e4-a975-8fb69bf6d40b",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -23296,
+        16320
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 8192,
+          "temperature": 0,
+          "maxRetries": 3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -21360,
+        17264
+      ],
+      "id": "736ee2a0-bd7f-41f1-9475-da0ae932dd78",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "HxZSm4yHWrfuS7eT",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the Stakeholder Update Agent for Mira. Your job is to write the prose parts of a short, professional progress update email — not a structured status report, and not the blocker/deadline check. Ground every claim in real retrieved task and milestone data; never invent progress, blockers, or dates not present in the retrieved context.\n\nTOOL USE IS MANDATORY: call R11 once before writing. Do not re-query.\n\nSCOPE: If a sprint is named, scope the update to that sprint's real tasks and milestones only. If no sprint is named, cover the most recent/current sprint's real activity.\n\nWHAT YOU WRITE vs WHAT A DOWNSTREAM STEP WRITES: You author \"subject,\" \"progress_summary,\" and \"next_steps\" as prose. You do NOT decide or write anything about blockers or missed deadlines — a downstream step checks every task's due_date in real code and writes that sentence itself, the same way it determines status-report categories elsewhere in this system. Your job is only to report the real task fields (status, due_date) faithfully in \"tasks,\" exactly as retrieved, without judging whether a date has passed.\n\nCONTENT:\n- \"subject\": a short subject line for the email (no quotes, no emoji — those are added by the downstream step).\n- \"progress_summary\": 2-3 sentences summarizing real progress for the scope (tasks completed/in progress, referencing real task IDs). Do not mention blockers, risks, or missed deadlines here — that belongs entirely to the downstream step.\n- \"next_steps\": one sentence on what's next.\n- \"tasks\": every real task record in scope (the same sprint/current-sprint tasks your progress_summary is about), each with its task_id, task name, literal status field (\"Done\"/\"In Progress\"/\"To Do\"/\"Blocked\"), and due_date normalized to YYYY-MM-DD. For any task whose status is \"Blocked,\" also include \"reason\" with the exact blocker text. Include EVERY non-Done task in scope here, not just ones you think are blocked — the downstream step needs the full set to check due dates itself, and it will only ever mention a task by name if it's actually blocked or actually past due, so including extra candidates here never produces a wrong claim.\n\nIf sufficient_data is false (the tool returned nothing relevant, or you couldn't call it), set \"sufficient_data\" to false and \"insufficient_data_message\" to one short sentence naming what's missing; leave \"tasks\" as [].\n\n## OUTPUT FORMAT — STRICT JSON ONLY\nOutput ONLY a single JSON object — no prose, no markdown, no code fences, no text before or after it.\n\nSchema:\n{\n  \"sufficient_data\": boolean,\n  \"insufficient_data_message\": string,\n  \"subject\": string,\n  \"progress_summary\": string,\n  \"next_steps\": string,\n  \"tasks\": [\n    { \"task_id\": string, \"task\": string, \"status\": \"Done\" | \"In Progress\" | \"To Do\" | \"Blocked\", \"due_date\": \"YYYY-MM-DD\", \"reason\": string }\n  ]\n}\n\nNotes:\n- \"reason\" is only meaningful for \"Blocked\" tasks; use an empty string for all others.\n- \"insufficient_data_message\" is only used when sufficient_data is false; use an empty string otherwise."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -21360,
+        17024
+      ],
+      "id": "4060be67-cbd5-4dad-96d3-c3d6011a2b8c",
+      "name": "N30: Stakeholder Update Agent"
+    },
+    {
+      "parameters": {
+        "content": "##  Schedule Trigger for Milestone Tracking Daily",
+        "height": 560,
+        "width": 1392,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -23152,
+        15712
+      ],
+      "typeVersion": 1,
+      "id": "511de479-0cbd-4908-b17e-abe9746ab2c1",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Final Gate: Output to Slack or Webhook or both",
+        "height": 640,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -18640,
+        16992
+      ],
+      "typeVersion": 1,
+      "id": "11d2c72b-19d6-4525-b8de-8fdaf4077d40",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Specialist Agents: Planner Agent, Risk Assessor Agent, Status Reporter Agent, Stakeholder Update Agent with Retrieval Nodes from Pinecone for relevant context set as a Tool for the respective agents",
+        "height": 2272,
+        "width": 1008,
+        "color": "#E6EEDD"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -21712,
+        15600
+      ],
+      "typeVersion": 1,
+      "id": "13d95d7e-520d-48e8-8f1c-0b10682c297f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Downstream steps to Verify/ Validate, send for Slack approval as required, Additional Tasks before reaching the Final Gate for sending final responses to Slack/ Webhook.",
+        "height": 1456,
+        "width": 1936,
+        "color": "#E7F9F8"
+      },
+      "id": "acc04c14-ccae-40d4-84a1-1a592a1e6fc4",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20656,
+        15968
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Shared empty-output guard for Planner/Status/Stakeholder.\n// If the agent timed out or returned nothing, swap in a plain\n// fallback instead of letting a blank message reach the user.\nconst raw = ($json.output ?? '').toString();\nif (raw.trim() === '') {\n  return [{ json: {\n    ...$json,\n    output: \"We're experiencing high volume of requests right now \\u2014 please check back in a moment.\"\n  } }];\n}\nreturn [{ json: $json }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20192,
+        17232
+      ],
+      "id": "4cc253a0-0154-4230-bd25-9ddbd6d7eb20",
+      "name": "N33: Guard Empty Agent Output"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d1e2a3c4-0034-4034-8034-000000000034",
+              "leftValue": "={{ ($json.output ?? $json.text ?? '').trim() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -20576,
+        16208
+      ],
+      "id": "740acd7d-6fed-459d-b854-92ed763170cd",
+      "name": "N34: IF Risk Output Empty?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1e2a3c4-0035-4035-8035-000000000035",
+              "name": "output",
+              "value": "=We're experiencing high volume of requests right now \\u2014 please check back in a moment.",
+              "type": "string"
+            },
+            {
+              "id": "e1e2a3c4-0035-4035-8035-000000000036",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -19760,
+        17056
+      ],
+      "id": "4bd8765d-9f9b-4512-96fd-d9caf878e7aa",
+      "name": "N35: Risk High Volume Message"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -23248,
+        16464
+      ],
+      "id": "3a85bba5-e115-47ea-86cc-076d57d516e5",
+      "name": "N1: When chat message received",
+      "webhookId": "5cd36104-064c-4e12-aa3f-c9fdc80030e6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N26: Format Status Report\n// N25 now outputs structured JSON (report_scope, answer, tasks[], upcoming_milestones[],\n// requested_categories[], sufficient_data, no_actionable_request) instead of writing the\n// final human-readable text itself. This node does the counting, category bucketing,\n// due-date comparison, and category-scoping filter deterministically in real code, then\n// assembles the exact final text.\n//\n// This is NOT a re-read of Google Sheets/Drive: it only reformats the data N25 already\n// retrieved via its Pinecone tool call this same run.\n\nfunction stripCodeFence(s) {\n  const t = s.trim();\n  const fence = t.match(/^```(?:json)?\\s*([\\s\\S]*?)\\s*```$/i);\n  return fence ? fence[1] : t;\n}\n\nfunction safeParse(raw) {\n  try {\n    return JSON.parse(stripCodeFence(raw));\n  } catch (e) {\n    return null;\n  }\n}\n\nconst raw = ($json.output ?? '').toString();\nconst data = safeParse(raw);\n\nif (!data) {\n  // Malformed/non-JSON agent output — let the existing empty-output guard (N33)\n  // handle it the same way it handles a truly empty response.\n  return [{ json: { ...$json, output: '' } }];\n}\n\nif (data.no_actionable_request) {\n  const answer = (data.answer || 'Could you share more details on what you\\'d like a status update on?').trim();\n  return [{ json: { ...$json, output: `🔍${answer}` } }];\n}\n\nconst reportScope = data.report_scope || 'All Sprints';\nconst answer = (data.answer || '').trim();\n\n// --- Which task-board categories did the user actually ask for? ---\n// N25 sets this from CATEGORY SCOPING. Empty / missing / containing \"all\" means every\n// category is in scope (a general status check).\nconst ALL_CATS = ['done', 'in_progress', 'to_do', 'blocked', 'at_risk'];\nlet requestedCats = Array.isArray(data.requested_categories) ? data.requested_categories : [];\nrequestedCats = requestedCats.map((c) => (c || '').toString().trim().toLowerCase());\nconst wantsAll = requestedCats.length === 0 || requestedCats.includes('all');\nconst scopeSet = new Set(wantsAll ? ALL_CATS : requestedCats.filter((c) => ALL_CATS.includes(c)));\n// Guard against a malformed/empty list after filtering (fall back to showing everything\n// rather than silently producing an empty report).\nif (scopeSet.size === 0) ALL_CATS.forEach((c) => scopeSet.add(c));\n\n// --- Dedup + bucket tasks deterministically ---\nconst todayStr = (typeof $now !== 'undefined' ? $now.toFormat('yyyy-MM-dd') : new Date().toISOString().slice(0, 10));\n\nconst seenTasks = new Map();\nfor (const t of Array.isArray(data.tasks) ? data.tasks : []) {\n  if (!t || !t.task_id) continue;\n  if (!seenTasks.has(t.task_id)) seenTasks.set(t.task_id, t);\n}\n\nconst done = [];\nconst inProgress = [];\nconst toDo = [];\nconst blocked = [];\nconst atRisk = [];\n\nfor (const t of seenTasks.values()) {\n  const status = (t.status || '').trim();\n  const dueDate = (t.due_date || '').trim(); // expected YYYY-MM-DD\n\n  // Determine the task's TRUE bucket first (independent of what was asked for) —\n  // due-date math always runs on every retrieved task, never only on the ones\n  // literally marked \"Blocked\", so at-risk detection works even when N25 pulled in\n  // a task for a different reason (e.g. checking \"blocked or at risk\" together).\n  let bucket;\n  let entry;\n  if (status === 'Blocked') {\n    bucket = 'blocked';\n    entry = { task_id: t.task_id, task: t.task, reason: t.reason || 'no reason given' };\n  } else {\n    const isPastDue = dueDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(dueDate) && dueDate < todayStr;\n    if (isPastDue && status !== 'Done') {\n      bucket = 'at_risk';\n      entry = { task_id: t.task_id, task: t.task, reason: `due date ${dueDate} has passed, not done` };\n    } else if (status === 'Done') {\n      bucket = 'done';\n      entry = { task_id: t.task_id, task: t.task };\n    } else if (status === 'In Progress') {\n      bucket = 'in_progress';\n      entry = { task_id: t.task_id, task: t.task };\n    } else {\n      bucket = 'to_do';\n      entry = { task_id: t.task_id, task: t.task };\n    }\n  }\n\n  // Only keep it in the OUTPUT if its true bucket is actually in scope. A task N25\n  // included only so at-risk status could be checked (e.g. a To Do task that turned\n  // out not to be overdue) must not leak into a category nobody asked about.\n  if (!scopeSet.has(bucket)) continue;\n\n  if (bucket === 'blocked') blocked.push(entry);\n  else if (bucket === 'at_risk') atRisk.push(entry);\n  else if (bucket === 'done') done.push(entry);\n  else if (bucket === 'in_progress') inProgress.push(entry);\n  else toDo.push(entry);\n}\n\n// --- Dedup milestones ---\nconst seenMilestones = new Map();\nfor (const m of Array.isArray(data.upcoming_milestones) ? data.upcoming_milestones : []) {\n  if (!m || !m.milestone_id) continue;\n  if (!seenMilestones.has(m.milestone_id)) seenMilestones.set(m.milestone_id, m);\n}\nconst milestones = [...seenMilestones.values()];\n\n// --- Health (deterministic) — always reflects the FULL picture, not just what's scoped ---\n// Health should never look rosier just because the request narrowed to one category, so\n// this stays based on the true blocked/at-risk sets before scope filtering would have run.\n// Recompute from the unfiltered seenTasks so a \"which tasks are blocked\" query still\n// reports the real overall health rather than one derived from a partial view.\nlet trueBlockedCount = 0;\nlet trueAtRiskCount = 0;\nfor (const t of seenTasks.values()) {\n  const status = (t.status || '').trim();\n  const dueDate = (t.due_date || '').trim();\n  if (status === 'Blocked') { trueBlockedCount++; continue; }\n  const isPastDue = dueDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(dueDate) && dueDate < todayStr;\n  if (isPastDue && status !== 'Done') trueAtRiskCount++;\n}\nlet health;\nif (trueBlockedCount === 0 && trueAtRiskCount === 0) health = 'Green';\nelse if (trueBlockedCount > 0) health = 'Red';\nelse health = 'Amber';\n\n// --- Scope line (part 1) ---\nconst categories = [\n  ['done', 'done', done],\n  ['in_progress', 'in progress', inProgress],\n  ['to_do', 'to do', toDo],\n  ['blocked', 'blocked', blocked],\n  ['at_risk', 'at risk', atRisk],\n];\nconst nonEmptyCats = categories.filter(([, , arr]) => arr.length > 0);\n\nlet taskClause = '';\nif (nonEmptyCats.length === 1) {\n  const n = nonEmptyCats[0][2].length;\n  taskClause = `${n} task${n === 1 ? '' : 's'} found`;\n} else if (nonEmptyCats.length > 1) {\n  taskClause = nonEmptyCats.map(([, label, arr]) => `${arr.length} ${label}`).join(', ');\n}\n\nconst milestoneClause = milestones.length > 0\n  ? `${milestones.length} milestone${milestones.length > 1 ? 's' : ''} found`\n  : '';\n\nlet scopeBody = [taskClause, milestoneClause].filter(Boolean).join(', ');\nif (!scopeBody) scopeBody = 'nothing found';\n\nlet scopeLine = `🔍Scoped to ${reportScope} — ${scopeBody}.`;\nif (answer) {\n  scopeLine = `${answer}\\n\\n${scopeLine}`;\n}\n\n// --- Status report (part 2) ---\nconst lines = [];\nif (done.length) lines.push(`Done: ${done.map((t) => `${t.task_id} - ${t.task}`).join(', ')}`);\nif (inProgress.length) lines.push(`In progress: ${inProgress.map((t) => `${t.task_id} - ${t.task}`).join(', ')}`);\nif (toDo.length) lines.push(`To do: ${toDo.map((t) => `${t.task_id} - ${t.task}`).join(', ')}`);\nif (blocked.length) lines.push(`Blocked: ${blocked.map((t) => `${t.task_id} - ${t.task} (${t.reason})`).join(', ')}`);\nif (atRisk.length) lines.push(`At risk: ${atRisk.map((t) => `${t.task_id} - ${t.task} (${t.reason})`).join(', ')}`);\nif (milestones.length) lines.push(`Upcoming milestones: ${milestones.map((m) => `${m.milestone_id} - ${m.milestone}`).join(', ')}`);\n\n// The header should name what's actually being shown. \"Status report\" implies the full\n// picture, so it's only used for a genuine general check (requested_categories \"all\").\n// A query narrowed to specific categories (e.g. \"which tasks are blocked or at risk\")\n// gets a header built from exactly those categories instead — and overall health, being\n// a whole-picture signal nobody asked about here, is only shown on the general-check header.\nconst CAT_TITLE = { done: 'Done', in_progress: 'In progress', to_do: 'To do', blocked: 'Blocked', at_risk: 'At risk' };\nlet header;\nif (wantsAll) {\n  header = `📊Status report for ${reportScope} (overall health: ${health}):`;\n} else {\n  const labels = ALL_CATS.filter((c) => scopeSet.has(c)).map((c) => CAT_TITLE[c]);\n  const labelStr = labels.length <= 1\n    ? labels.join('')\n    : labels.slice(0, -1).join(', ') + ' & ' + labels[labels.length - 1];\n  header = `📊${labelStr} — ${reportScope}:`;\n}\n\nconst part2 = `${header}\\n${lines.join('\\n')}`;\n\nconst output = `${scopeLine}\\n\\n${part2}`;\n\nreturn [{ json: { ...$json, output } }];\n"
+      },
+      "id": "1dd549e3-d74a-4dcd-9665-9727859f962a",
+      "name": "N26: Format Status Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20416,
+        16736
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Mirabot-NewRefined",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -23248,
+        16720
+      ],
+      "id": "66fdf72c-086c-46c6-a22a-135a1cae5259",
+      "name": "N1: Webhook1",
+      "webhookId": "2cf04ea7-a347-4b2a-882a-8fe76ee60d73"
+    },
+    {
+      "parameters": {
+        "jsCode": "// N31: Format Stakeholder Email\n// N30 now outputs structured JSON: an LLM-authored subject/progress_summary/next_steps\n// (prose is still the agent's job — this is an email, not a data table), plus a \"tasks\"\n// array of real task records it retrieved (task_id/task/status/due_date/reason). This\n// node deterministically checks each task's due_date in real code and writes the\n// blocker/missed-deadline sentence itself, the same way N26 does for the status report —\n// so \"are there any blockers\" is never answered by the LLM doing date math in its head.\n\nfunction stripCodeFence(s) {\n  const t = s.trim();\n  const fence = t.match(/^```(?:json)?\\s*([\\s\\S]*?)\\s*```$/i);\n  return fence ? fence[1] : t;\n}\n\nfunction safeParse(raw) {\n  try {\n    return JSON.parse(stripCodeFence(raw));\n  } catch (e) {\n    return null;\n  }\n}\n\nconst raw = ($json.output ?? '').toString();\nconst data = safeParse(raw);\n\nif (!data) {\n  // Malformed/non-JSON agent output — let N33's empty-output guard handle it.\n  return [{ json: { ...$json, output: '' } }];\n}\n\nif (data.sufficient_data === false) {\n  const msg = (data.insufficient_data_message || \"There isn't enough tracked data to write this update.\").trim();\n  return [{ json: { ...$json, output: msg } }];\n}\n\nconst subject = (data.subject || 'Project Update').trim();\nconst progressSummary = (data.progress_summary || '').trim();\nconst nextSteps = (data.next_steps || '').trim();\n\n// --- Dedup + check tasks deterministically ---\nconst todayStr = (typeof $now !== 'undefined' ? $now.toFormat('yyyy-MM-dd') : new Date().toISOString().slice(0, 10));\n\nconst seenTasks = new Map();\nfor (const t of Array.isArray(data.tasks) ? data.tasks : []) {\n  if (!t || !t.task_id) continue;\n  if (!seenTasks.has(t.task_id)) seenTasks.set(t.task_id, t);\n}\n\nconst blocked = [];\nconst overdue = [];\nfor (const t of seenTasks.values()) {\n  const status = (t.status || '').trim();\n  const dueDate = (t.due_date || '').trim();\n\n  if (status === 'Blocked') {\n    blocked.push({ task_id: t.task_id, task: t.task, reason: t.reason || 'no reason given' });\n    continue;\n  }\n  const isPastDue = dueDate && /^\\d{4}-\\d{2}-\\d{2}$/.test(dueDate) && dueDate < todayStr;\n  if (isPastDue && status !== 'Done') {\n    overdue.push({ task_id: t.task_id, task: t.task, due_date: dueDate });\n  }\n}\n\n// --- Build the blocker/risk sentence deterministically ---\nlet blockerSentence;\nif (blocked.length === 0 && overdue.length === 0) {\n  blockerSentence = 'There are no reported blockers or missed deadlines at this time.';\n} else {\n  const parts = [];\n  if (blocked.length) {\n    parts.push(\n      `${blocked.length > 1 ? 'tasks' : 'task'} ${blocked.map((t) => `${t.task_id} - ${t.task} (${t.reason})`).join(', ')} ${blocked.length > 1 ? 'are' : 'is'} blocked`\n    );\n  }\n  if (overdue.length) {\n    parts.push(\n      `${overdue.length > 1 ? 'tasks' : 'task'} ${overdue.map((t) => `${t.task_id} - ${t.task} (due ${t.due_date}, not yet done)`).join(', ')} ${overdue.length > 1 ? 'have' : 'has'} missed ${overdue.length > 1 ? 'their' : 'its'} deadline`\n    );\n  }\n  blockerSentence = `However, ${parts.join('; and ')}.`;\n}\n\nconst bodyParts = [progressSummary, blockerSentence, nextSteps].filter(Boolean);\nconst body = bodyParts.join(' ');\n\nconst output = `📧 *${subject}*\\n\\nHello,\\n\\n${body}\\n\\nBest regards,\\nMira`;\n\nreturn [{ json: { ...$json, output } }];\n"
+      },
+      "id": "da2659ca-9af5-46ce-bafd-3687ac6e0bd5",
+      "name": "N31: Format Stakeholder Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20560,
+        17232
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "N6: Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "N6: Classifier Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N8: IF: JSON Valid?": {
+      "main": [
+        [
+          {
+            "node": "N9: Switch: Route by Intent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "E: Notify Parse Error to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N9: Switch: Route by Intent": {
+      "main": [
+        [
+          {
+            "node": "N11: Planner Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N16: Risk Assessor Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N25: Status Reporter Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N30: Stakeholder Update Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N10: Ask for Clarification (unclear branch)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N11: Planner Agent": {
+      "main": [
+        [
+          {
+            "node": "N33: Guard Empty Agent Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N17: Parse Risk JSON": {
+      "main": [
+        [
+          {
+            "node": "N18: IF: Risk Sufficient Detail?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N18: IF: Risk Sufficient Detail?": {
+      "main": [
+        [
+          {
+            "node": "N20: IF: New Risk Identified?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N19: Ask for More Risk Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N20: IF: New Risk Identified?": {
+      "main": [
+        [
+          {
+            "node": "N21: Build New Risk Rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N24: Return Risk Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N21: Build New Risk Rows": {
+      "main": [
+        [
+          {
+            "node": "N21b: New Risk Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N25: Status Reporter Agent": {
+      "main": [
+        [
+          {
+            "node": "N26: Format Status Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EC1: Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "EC2: Slack Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N16: Risk Assessor Agent": {
+      "main": [
+        [
+          {
+            "node": "N34: IF Risk Output Empty?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "M1: Daily Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "M2: Milestone Tracker Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N6a: JS-Parse & Validate JSON": {
+      "main": [
+        [
+          {
+            "node": "N7: Multi-intent message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "N6: Classifier Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "M2: Milestone Tracker Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "N11: Planner Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "N16: Risk Assessor Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "N25: Status Reporter Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N6: Classifier Agent": {
+      "main": [
+        [
+          {
+            "node": "N6a: JS-Parse & Validate JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R10: Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "risk_register_search",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R11: Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "R11: Pinecone Get (Status Context)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R9: Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "R9: Pinecone Get (Planner Context)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R9: Pinecone Get (Planner Context)": {
+      "ai_tool": [
+        [
+          {
+            "node": "N11: Planner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R11: Pinecone Get (Status Context)": {
+      "ai_tool": [
+        [
+          {
+            "node": "N25: Status Reporter Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "N30: Stakeholder Update Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R12: Pinecone Get (Milestones Context)": {
+      "ai_tool": [
+        [
+          {
+            "node": "M2: Milestone Tracker Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "R12: Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "R12: Pinecone Get (Milestones Context)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "M2: Milestone Tracker Agent": {
+      "main": [
+        [
+          {
+            "node": "M3: Parse Milestone JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "M3: Parse Milestone JSON": {
+      "main": [
+        [
+          {
+            "node": "M4: Post Milestone Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "M4: Post Milestone Alert": {
+      "main": [
+        [
+          {
+            "node": "M4S: Post Milestone Alert to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N23: Confirm Risk Added": {
+      "main": [
+        [
+          {
+            "node": "Final Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N24: Return Risk Matrix": {
+      "main": [
+        [
+          {
+            "node": "Final Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "risk_register_search": {
+      "ai_tool": [
+        [
+          {
+            "node": "N16: Risk Assessor Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N22: Append New Risks to Risk Register": {
+      "main": [
+        [
+          {
+            "node": "N23: Confirm Risk Added",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N10: Ask for Clarification (unclear branch)": {
+      "main": [
+        [
+          {
+            "node": "Final Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N19: Ask for More Risk Detail": {
+      "main": [
+        [
+          {
+            "node": "Final Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N7: Multi-intent message": {
+      "main": [
+        [
+          {
+            "node": "N8: IF: JSON Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N21b: New Risk Approval": {
+      "main": [
+        [
+          {
+            "node": "N21c: Expand Approved Risks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N2: User Input": {
+      "main": [
+        [
+          {
+            "node": "N6: Classifier Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N21c: Expand Approved Risks": {
+      "main": [
+        [
+          {
+            "node": "N22: Append New Risks to Risk Register",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Gate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post Message to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Message to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "N30: Stakeholder Update Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N30: Stakeholder Update Agent": {
+      "main": [
+        [
+          {
+            "node": "N31: Format Stakeholder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N33: Guard Empty Agent Output": {
+      "main": [
+        [
+          {
+            "node": "Final Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N34: IF Risk Output Empty?": {
+      "main": [
+        [
+          {
+            "node": "N35: Risk High Volume Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "N17: Parse Risk JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N35: Risk High Volume Message": {
+      "main": [
+        [
+          {
+            "node": "Final Gate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N1: When chat message received": {
+      "main": [
+        [
+          {
+            "node": "N2: User Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N26: Format Status Report": {
+      "main": [
+        [
+          {
+            "node": "N33: Guard Empty Agent Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N1: Webhook1": {
+      "main": [
+        [
+          {
+            "node": "N2: User Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "N31: Format Stakeholder Email": {
+      "main": [
+        [
+          {
+            "node": "N33: Guard Empty Agent Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "66a15d83-2954-41a6-b3a6-c8ad03ba0e03",
+  "meta": {
+    "instanceId": "4ef392a66fc7bdf12c25758c4b85dea009b646785e2b6546f44ba6010b356125"
+  },
+  "nodeGroups": [],
+  "id": "g8goSsiHUGYtVtCi",
+  "tags": []
+}
