@@ -34,7 +34,7 @@ Build an assistant that answers project-management requests **grounded in the te
 - **Stakeholder Update Generation** — drafts a short progress-update email grounded in real task/milestone data, with blocker and missed-deadline detection done deterministically rather than asserted by the model.
 - **Fine-tuning of the Risk Assessor Agent** — a fine-tuned `gpt-4o-mini` variant trained on this build's own confirmed bug/fix pairs (see `code/FineTuning/`).
 
-*(The PRD notes five extended capabilities were selected in total against the brief's optional list — see `docs/Mira - Problem Statement & PRD.pdf` §3 for the complete rationale on what was chosen and what was descoped.)*
+*(The PRD notes five extended capabilities were selected in total against the brief's optional list — see `docs/Mira - Problem Statement & PRD.pdf` Section 3 for the complete rationale on what was chosen and what was descoped.)*
 
 ## Architecture
 
