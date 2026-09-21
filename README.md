@@ -1,5 +1,7 @@
 # Mira — AI-Powered Project Intelligence Assistant
 
+**Repository:** [github.com/reachmesrividyap-GH/Mira-ProjectIntelligenceAssistant](https://github.com/reachmesrividyap-GH/Mira-ProjectIntelligenceAssistant)
+
 Mira is a multi-agent, RAG-grounded project-intelligence assistant built entirely in [n8n](https://n8n.io/). It ingests a project's own source documents (project description, timeline, task board, risk register) into a Pinecone vector index, then serves plan generation, risk assessment, weekly status reporting, stakeholder update drafting, and daily milestone alerting on top of that grounded data — with a deterministic (non-LLM) verification layer behind every agent so its own claims about dates, counts, and statuses are checked in code rather than trusted at face value.
 
 ## Problem
@@ -93,7 +95,7 @@ The workflows are grounded against a set of sample project records for the refer
 ## Repository Structure
 
 ```
-Mira-ProjectManagementAgent/
+Mira-ProjectIntelligenceAssistant/
 ├── README.md
 ├── code/
 │   ├── MiraProject/        # the two n8n workflow exports + the ask-mira.html test client
