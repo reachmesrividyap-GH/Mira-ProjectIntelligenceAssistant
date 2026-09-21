@@ -1,4 +1,4 @@
-# Mira — AI-Powered Project Management Assistant
+# Mira — AI-Powered Project Intelligence Assistant
 
 Mira is a multi-agent, RAG-grounded project-intelligence assistant built entirely in [n8n](https://n8n.io/). It ingests a project's own source documents (project description, timeline, task board, risk register) into a Pinecone vector index, then serves plan generation, risk assessment, weekly status reporting, stakeholder update drafting, and daily milestone alerting on top of that grounded data — with a deterministic (non-LLM) verification layer behind every agent so its own claims about dates, counts, and statuses are checked in code rather than trusted at face value.
 
